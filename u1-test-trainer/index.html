@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Тренажёр: Present Perfect и Past Simple</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4F6FB; --surface:#FFFFFF; --ink:#1D2550; --muted:#5B6386; --line:#DCE0EE;
+  --accent:#3346D3; --accent-soft:#E7EAFF; --mark:#FFE36B; --mark-ink:#1D2550;
+  --ok:#1C8758; --ok-soft:#E3F5EC; --bad:#CC3B3B; --bad-soft:#FCE9E9;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#11142A; --surface:#1A1E3B; --ink:#E8EAF8; --muted:#A3A9CD; --line:#2D3260;
+    --accent:#8C9BFF; --accent-soft:#252B57; --mark:#E6C02E; --mark-ink:#11142A;
+    --ok:#4CC88E; --ok-soft:#173A2C; --bad:#F27474; --bad-soft:#40202A; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11142A; --surface:#1A1E3B; --ink:#E8EAF8; --muted:#A3A9CD; --line:#2D3260;
+  --accent:#8C9BFF; --accent-soft:#252B57; --mark:#E6C02E; --mark-ink:#11142A;
+  --ok:#4CC88E; --ok-soft:#173A2C; --bad:#F27474; --bad-soft:#40202A; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.55 "Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:28px 20px 60px}
+h1{font:700 clamp(28px,5vw,44px)/1.08 "Unbounded","Golos Text",system-ui,sans-serif;margin:0 0 12px;letter-spacing:-.01em}
+.lead{color:var(--muted);max-width:62ch;margin:0}
+mark,.hl{background:linear-gradient(transparent 12%,var(--mark) 12%,var(--mark) 88%,transparent 88%);color:var(--mark-ink);padding:0 .15em;border-radius:2px}
+.hero-line{margin:26px 0 30px;padding:18px 18px 14px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.tl{position:relative;height:46px;margin:6px 4px 2px}
+.tl::before{content:"";position:absolute;left:0;right:0;top:22px;height:2px;background:var(--line)}
+.tl .pt{position:absolute;top:13px;width:20px;height:20px;border-radius:50%;border:2px solid var(--ink);background:var(--surface)}
+.tl .now{position:absolute;right:0;top:9px;width:28px;height:28px;border-radius:50%;background:var(--accent)}
+.tl .arc{position:absolute;top:2px;height:21px;border:2px dashed var(--accent);border-bottom:none;border-radius:40px 40px 0 0}
+.tl-cap{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);gap:12px;flex-wrap:wrap}
+.tl-cap b{color:var(--ink);font-weight:600}
+.topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.topic{display:flex;flex-direction:column;justify-content:flex-start;text-align:left;width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font:inherit;cursor:pointer}
+.topic:hover{border-color:var(--accent)}
+.topic:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.topic h3{margin:0 0 4px;font:600 17px/1.3 "Golos Text",sans-serif}
+.topic p{margin:0;font-size:14px;color:var(--muted)}
+.topic .best{margin-top:auto;padding-top:8px;font-size:13px;color:var(--muted)}
+.topic .best b{color:var(--ok)}
+.topic.special{border-color:var(--accent);background:var(--accent-soft)}
+h2{font:600 20px/1.3 "Golos Text",sans-serif;margin:34px 0 12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 22px 20px}
+.bar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.back{background:none;border:none;color:var(--accent);font:600 15px/1 "Golos Text",sans-serif;cursor:pointer;padding:6px 0}
+.ttl{font-weight:600}
+.dots{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--line)}
+.dot.ok{background:var(--ok)} .dot.bad{background:var(--bad)} .dot.cur{outline:2px solid var(--accent);outline-offset:1px}
+.task{font-size:14px;color:var(--muted);margin:0 0 8px}
+.q{font-size:clamp(19px,3vw,23px);line-height:1.45;margin:0 0 18px}
+.q .gap{display:inline-block;min-width:3.2em;border-bottom:2px solid var(--ink);margin:0 .15em;text-align:center}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;padding:12px 14px;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;font:500 17px/1.35 "Golos Text",sans-serif;cursor:pointer}
+.opt .k{flex:none;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)} .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt[disabled]{cursor:default}
+.inrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.inp{font:500 18px/1.2 "Golos Text",sans-serif;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);min-width:0;flex:1 1 180px}
+.inp.right{border-color:var(--ok);background:var(--ok-soft)} .inp.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.forms{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;align-items:center}
+.forms .v1{font:700 22px/1 "Unbounded",sans-serif}
+.forms label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;min-height:50px;padding:10px;border:1.5px dashed var(--line);border-radius:10px;margin-bottom:10px}
+.tiles.answer{border-style:solid;background:var(--paper)}
+.tile{font:500 17px/1 "Golos Text",sans-serif;padding:10px 12px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.tile:hover{border-color:var(--accent)}
+.story{font-size:18px;line-height:2.1}
+.story input{font:500 16px/1.2 "Golos Text",sans-serif;width:9.5em;padding:5px 7px;border:1.5px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink)}
+.story input.right{border-color:var(--ok);background:var(--ok-soft)} .story input.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.story small{color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn{font:600 16px/1 "Golos Text",sans-serif;padding:13px 18px;border-radius:10px;border:none;background:var(--accent);color:#fff;cursor:pointer}
+:root[data-theme="dark"] .btn{color:#11142A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#11142A}}
+.btn.ghost,:root[data-theme="dark"] .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.ghost{color:var(--accent)}}
+.fb{margin-top:16px;padding:14px 16px;border-radius:10px;border-left:4px solid var(--ok);background:var(--ok-soft)}
+.fb.bad{border-left-color:var(--bad);background:var(--bad-soft)}
+.fb b.v{display:block;margin-bottom:4px}
+.fb .ans{font-weight:600}
+.rule{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);font-size:15px}
+.sum{text-align:left}
+.big{font:700 clamp(40px,8vw,64px)/1 "Unbounded",sans-serif;margin:6px 0 8px}
+.missed{margin:14px 0 0;padding-left:20px}
+.missed li{margin-bottom:6px}
+footer{margin-top:40px;font-size:13px;color:var(--muted)}
+footer a{color:var(--accent)}
+.hide{display:none!important}
+.rules-list{display:grid;gap:10px}
+.rules-list div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px}
+.rules-list .rt{display:block;font-weight:600;margin-bottom:2px}
+@media (max-width:560px){.wrap{padding:20px 14px 48px}.card{padding:18px 14px}.forms{grid-template-columns:1fr 1fr}.forms .v1{grid-column:1/-1}}
+@media (prefers-reduced-motion:no-preference){.fb{animation:pop .18s ease-out}@keyframes pop{from{transform:translateY(4px);opacity:0}to{transform:none;opacity:1}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <main id="home">
+    <h1>Тренажёр: Present Perfect и Past Simple</h1>
+    <p class="lead">Задания собраны по ошибкам из теста Think 2, Unit 1. Подсвеченные слова — <mark>маркеры времени</mark>, по ним выбирают время глагола. После каждого ответа появляется правило, ошибки сохраняются в разделе «Мои ошибки».</p>
+
+    <div class="hero-line" aria-label="Схема времён">
+      <div class="tl" aria-hidden="true">
+        <span class="pt" style="left:12%"></span>
+        <span class="pt" style="left:34%"></span>
+        <span class="arc" style="left:calc(56% + 10px);right:14px"></span>
+        <span class="pt" style="left:56%;border-color:var(--accent)"></span>
+        <span class="now"></span>
+      </div>
+      <div class="tl-cap">
+        <span><b>Past Simple</b> — было и закончилось: <mark>yesterday</mark>, <mark>last year</mark>, <mark>in 2016</mark></span>
+        <span><b>Present Perfect</b> — связано с «сейчас»: <mark>already</mark>, <mark>yet</mark>, <mark>so far</mark>, <mark>three times</mark></span>
+      </div>
+    </div>
+
+    <h2>Выбери тему</h2>
+    <div class="topics" id="topics"></div>
+
+    <h2>Все правила на одной странице</h2>
+    <div class="rules-list" id="rules"></div>
+
+    <footer>
+      Правила сверены с источниками: <a href="https://www.oxfordlearnersdictionaries.com/grammar/online-grammar/present-perfect-simple-and-past-simple" target="_blank" rel="noopener">Oxford Learner’s Dictionaries</a>, <a href="https://learnenglish.britishcouncil.org/free-resources/grammar/b1-b2/present-perfect-just-yet-still-already" target="_blank" rel="noopener">British Council LearnEnglish</a>, <a href="https://www.cambridgeenglish.org/de/Images/653255-english-grammar-in-use-sample-paper-present-perfect.pdf" target="_blank" rel="noopener">English Grammar in Use, Unit 13</a>.
+      <br><button class="back" id="reset" type="button">Сбросить прогресс</button>
+    </footer>
+  </main>
+
+  <section id="play" class="hide">
+    <div class="card">
+      <div class="bar">
+        <button class="back" id="toHome" type="button">← Темы</button>
+        <span class="ttl" id="tTitle"></span>
+        <div class="dots" id="dots" aria-hidden="true"></div>
+      </div>
+      <div id="stage"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ---------- данные ---------- */
+const H = s => s.replace(/==(.+?)==/g,'<mark>$1</mark>');
+const RULES = {
+ forms:{t:'Формы глаголов',r:'Present Perfect = have/has + <b>3-я форма</b> (V3). Past Simple = <b>2-я форма</b> (V2). Правильные глаголы: +ed (start – started – started). Неправильные учим наизусть: write – wrote – written.'},
+ did:{t:'После did / didn’t — начальная форма',r:'<b>did</b> уже показывает прошлое, поэтому глагол остаётся в начальной форме: Did you <b>win</b>? He didn’t <b>sign</b>. Нельзя: did won, didn’t signed, did wrote.'},
+ ppps:{t:'Present Perfect или Past Simple',r:'Названо или понятно <b>когда</b> (yesterday, last year, in 2016, when he was young) → <b>Past Simple</b>. Время не названо, важен опыт, счёт или результат сейчас (ever, three times, so far, this term, already, yet) → <b>Present Perfect</b>. Если о событии уже сказали и спрашиваем подробности — снова <b>Past Simple</b>.'},
+ hashave:{t:'has или have',r:'<b>he / she / it</b> и один человек или предмет → <b>has / hasn’t</b>. <b>I / you / we / they</b> и несколько людей → <b>have / haven’t</b>.'},
+ order:{t:'Порядок слов',r:'have/has + <b>just / already</b> + V3: She has <b>already</b> done… <b>yet</b> — в конце отрицания или вопроса: I haven’t made the cake <b>yet</b>.'},
+ short:{t:'Краткие ответы',r:'Отвечаем тем же вспомогательным глаголом, с которого начинается вопрос: Have…? → I have / I haven’t. Did…? → I did / I didn’t. Was/Were…? → I was / they weren’t.'},
+ jay:{t:'just, already, yet',r:'<b>just</b> — «только что» (или «просто»: just great). <b>already</b> — «уже», раньше, чем ждали; в вопросе звучит удивлённо. <b>yet</b> — «уже?» в вопросе и «ещё не» в отрицании, стоит в конце.'},
+ coll:{t:'Устойчивые сочетания',r:'<b>make</b> friends / a mistake · <b>miss</b> your family / the bus · <b>sign</b> a contract / autographs · <b>win</b> a prize / a match · <b>write</b> songs / a book · <b>do</b> homework.'},
+ story:{t:'Время в тексте',r:'Читай текст целиком. Для каждого пропуска ищи маркер: когда это было? Есть время — Past Simple, нет времени или «с тех пор, до сих пор» — Present Perfect.'}
+};
+const C=(q,o,a,e)=>({type:'choice',q,o,a,e});
+const I=(q,acc,e)=>({type:'input',q,acc,e});
+const BANK = {
+ forms:[
+  ['be',['was/were','was','were'],['been']],['start',['started'],['started']],['learn',['learnt','learned'],['learnt','learned']],
+  ['write',['wrote'],['written']],['win',['won'],['won']],['sign',['signed'],['signed']],['appear',['appeared'],['appeared']],
+  ['retire',['retired'],['retired']],['perform',['performed'],['performed']],['live',['lived'],['lived']],['make',['made'],['made']],
+  ['miss',['missed'],['missed']],['do',['did'],['done']],['see',['saw'],['seen']],['go',['went'],['gone','been']],
+  ['meet',['met'],['met']],['buy',['bought'],['bought']],['take',['took'],['taken']],['visit',['visited'],['visited']],['finish',['finished'],['finished']]
+ ].map(([v,a2,a3])=>({type:'forms',v,a2,a3,e:'Present Perfect: have/has + V3. Past Simple: V2.'})),
+ did:[
+  I('Did you ___ the prize for best poem last year? <small>(win)</small>',['win'],'После Did — начальная форма: Did you win…?'),
+  I('He didn’t ___ the contract last night. <small>(sign)</small>',['sign'],'didn’t + sign, без -ed.'),
+  I('We didn’t ___ any new words yesterday. <small>(learn)</small>',['learn'],'didn’t + learn.'),
+  I('Did she ___ her first song at the age of ten? <small>(write)</small>',['write'],'Did + write. Wrote — уже прошедшая форма, после did она не нужна.'),
+  I('I didn’t ___ my family at summer camp. <small>(miss)</small>',['miss'],'didn’t + miss.'),
+  I('He didn’t ___ well in his first race. <small>(perform)</small>',['perform'],'didn’t + perform.'),
+  I('When did you ___ that film? <small>(see)</small>',['see'],'did + see (не saw).'),
+  I('Did you ___ friends at your new school last year? <small>(make)</small>',['make'],'Did + make (не made).'),
+  C('Какое предложение правильное?',['Did you won the match?','Did you win the match?','Did you wins the match?'],1,'Did + начальная форма: win.'),
+  C('Какое предложение правильное?',['I didn’t signed it.','I not signed it.','I didn’t sign it.'],2,'didn’t + sign.'),
+  C('Роза рассказывает о стихотворении. Как правильно?',['I did wrote about my cat.','I just wrote about my cat.','I did written about my cat.'],1,'«did wrote» невозможно: после did — только начальная форма. Здесь нужно just: «я просто написала о коте».'),
+  C('Какое предложение правильное?',['He didn’t learned any words.','He not learn any words.','He didn’t learn any words.'],2,'Отрицание в Past Simple: didn’t + learn.')
+ ],
+ ppps:[
+  C('I ___ to France ==three times==.',['have been','was'],0,'«Three times» — счёт опыта без даты → Present Perfect: I’ve been.'),
+  C('I ___ in France ==last year==.',['have been','was'],1,'«Last year» — время названо → Past Simple: was.'),
+  C('She ___ four books ==so far==.',['has written','wrote'],0,'«So far» — «на данный момент» → Present Perfect.'),
+  C('She ___ her fourth book ==last year==.',['has written','wrote'],1,'«Last year» → Past Simple: wrote.'),
+  C('Usain Bolt ___ running ==when he was very young==.',['has started','started'],1,'«When he was young» — понятно когда → Past Simple.'),
+  C('He ___ in the film <i>I Am Bolt</i> ==in 2016==.',['appeared','has appeared'],0,'Год назван → Past Simple.'),
+  C('We ___ any new words in English class ==yesterday==.',['haven’t learnt','didn’t learn'],1,'«Yesterday» → Past Simple: didn’t learn.'),
+  C('We ___ any new words ==this term==.',['haven’t learnt','didn’t learn'],0,'«This term» — четверть ещё идёт → Present Perfect.'),
+  C('— I’ve just won a prize in a poetry competition!<br>— Wow! What ___?',['have you won','did you win'],1,'О событии уже сказали, спрашиваем подробности → Past Simple: What did you win?'),
+  C('He ___ the contract ==so far==.',['hasn’t signed','didn’t sign'],0,'«So far» → Present Perfect.'),
+  C('He ___ the contract ==last night==.',['hasn’t signed','didn’t sign'],1,'«Last night» → Past Simple.'),
+  C('___ you ==ever== ___ a prize?',['Have … won','Did … win'],0,'«Ever» — опыт за всю жизнь → Present Perfect.'),
+  C('I ___ my keys! I can’t get into the house ==now==.',['have lost','lost'],0,'Результат важен сейчас (не могу войти) → Present Perfect.'),
+  C('Shakespeare ___ more than 30 plays.',['has written','wrote'],1,'Человек жил в прошлом, его жизнь закончилась → Past Simple.')
+ ],
+ hashave:[
+  C('He ___ signed the contract so far.',['haven’t','hasn’t'],1,'He → hasn’t.'),
+  C('My parents ___ already bought the tickets.',['has','have'],1,'Parents = they → have.'),
+  C('She ___ just called me.',['has','have'],0,'She → has.'),
+  C('___ your brother finished school yet?',['Has','Have'],0,'Brother = he → Has.'),
+  C('I ___ seen that film yet.',['haven’t','hasn’t'],0,'I → haven’t.'),
+  C('Tom and Anna ___ made a lot of friends.',['has','have'],1,'Tom and Anna = they → have.'),
+  C('It ___ stopped raining.',['has','have'],0,'It → has.'),
+  C('___ you ever won a competition?',['Has','Have'],1,'You → Have.')
+ ],
+ order:[
+  ['She','has','already','done','the interview.'],['We’ve','just','missed','the bus.'],['I','haven’t','made','the cake','yet.'],
+  ['Have','you','signed','the contract','yet?'],['He','has','just','finished','his homework.'],['They','have','already','bought','the tickets.'],
+  ['Has','she','called','you','yet?'],['I','haven’t','seen','that film','yet.']
+ ].map(w=>({type:'order',w,e:'have/has + just/already + V3; yet — в конце.'})),
+ short:[
+  C('Have you ever been to London?',['Yes, I was.','Yes, I have.','Yes, I did.'],1,'Have…? → I have.'),
+  C('Did you see the match yesterday?',['No, I haven’t.','No, I wasn’t.','No, I didn’t.'],2,'Did…? → I didn’t.'),
+  C('Has Tom called you yet?',['No, he hasn’t.','No, he didn’t.','No, he wasn’t.'],0,'Has…? → he hasn’t.'),
+  C('Was the test difficult?',['Yes, it has.','Yes, it was.','Yes, it did.'],1,'Was…? → it was.'),
+  C('Have your friends arrived yet?',['Yes, they did.','Yes, they were.','Yes, they have.'],2,'Have…? → they have.'),
+  C('Did she win the competition?',['Yes, she did.','Yes, she has.','Yes, she won.'],0,'Did…? → she did.'),
+  C('Were you at home last night?',['No, I didn’t.','No, I wasn’t.','No, I haven’t been.'],1,'Were…? → I wasn’t.'),
+  C('Were you popular at school?',['Yes, I’ve been popular.','Yes, I was.','Yes, I have.'],1,'Were…? → I was. Время вопроса — Past Simple.')
+ ],
+ jay:[
+  C('Have you finished your homework ___?',['yet','already','just'],0,'Обычный вопрос «уже?» → yet в конце.'),
+  C('I haven’t decided ___.',['already','yet','just'],1,'Отрицание «ещё не» → yet.'),
+  C('I’m not hungry — I’ve ___ had lunch.',['yet','already','still'],1,'«Уже» в утверждении → already.'),
+  C('Where’s Sam? — He’s ___ left. You missed him by a minute!',['just','yet','already'],0,'«Только что» → just.'),
+  C('That’s ___ great! Well done!',['already','yet','just'],2,'just great = «просто отлично».'),
+  C('Have you ___ finished?! That was so fast!',['yet','already','still'],1,'Удивление «Уже?!» → already.'),
+  C('She hasn’t replied to my message ___.',['yet','already','just'],0,'«Ещё не» → yet в конце.'),
+  C('We’ve ___ seen this film — let’s watch something else.',['yet','just','already'],2,'«Уже видели» → already.')
+ ],
+ coll:[
+  C('I don’t ___ friends very easily — I’m shy.',['do','make','win','write'],1,'make friends — заводить друзей.'),
+  C('At summer camp I really ___ my family.',['lost','made','missed','won'],2,'miss my family — скучать по семье.'),
+  C('Our teacher asked us to ___ a class contract.',['sign','write','make','win'],0,'sign a contract — подписать договор.'),
+  C('Anya ___ a prize for her short story.',['made','did','won','signed'],2,'win (won) a prize — выиграть приз.'),
+  C('He ___ his first songs when he was young.',['did','wrote','signed','won'],1,'write (wrote) songs — писать песни.'),
+  C('After the concert the singer ___ autographs for an hour.',['signed','wrote','made','did'],0,'sign autographs — раздавать автографы.'),
+  C('Hurry up or we’ll ___ the bus!',['lose','miss','do','make'],1,'miss the bus — опоздать на автобус.'),
+  C('Everyone ___ mistakes — that’s how we learn.',['does','wins','makes','writes'],2,'make a mistake — ошибаться.'),
+  C('Have you ___ your homework yet?',['made','done','won','written'],1,'do homework — делать домашнее задание.'),
+  C('Our team ___ the match 3–1!',['did','made','won','signed'],2,'win (won) a match — выиграть матч.')
+ ],
+ story:[{type:'story',e:'Есть время → Past Simple; «since then», «just», «ever» → Present Perfect.',
+  parts:['Mia Stone is a young singer from Manchester. She ',{v:'start',a:['started']},' singing ==when she was six==. ==In 2021== she ',{v:'appear',a:['appeared']},' on a TV talent show, but she ',{v:'not win',a:['didn’t win','did not win']},'. ==Since then== she ',{v:'write',a:['has written','’s written']},' more than thirty songs and ',{v:'visit',a:['has visited','visited']},' twelve countries on tour. ==Last month== she ',{v:'sign',a:['signed']},' a contract with a big record company. She ',{v:'just / finish',a:['has just finished','’s just finished']},' her first album — it comes out next week! ',{v:'you / ever / hear',a:['have you ever heard']},' her music?'],
+  why:['when she was six → Past Simple','in 2021 → Past Simple','в 2021 году → Past Simple, отрицание didn’t + win','since then → Present Perfect','since then → Present Perfect (has можно не повторять)','last month → Past Simple','just → Present Perfect','ever → Present Perfect']}]
+};
+const TOPICS=[
+ {id:'ppps',d:'Главная ошибка теста: время выбрано не по маркеру.'},
+ {id:'forms',d:'Глагол переписан из скобок без изменения: start вместо started.'},
+ {id:'did',d:'did won, didn’t signed, I did wrote.'},
+ {id:'hashave',d:'He haven’t signed вместо He hasn’t signed.'},
+ {id:'order',d:'She already has done вместо She has already done.'},
+ {id:'short',d:'Have you…? — No, I wasn’t.'},
+ {id:'jay',d:'already вместо just и yet.'},
+ {id:'coll',d:'make friends, miss family, sign a contract, win a prize.'},
+ {id:'story',d:'Все правила сразу — в связном тексте.'}
+];
+/* ---------- хранилище ---------- */
+const store={get(k,d){try{const v=localStorage.getItem('ppTrainer:'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('ppTrainer:'+k,JSON.stringify(v))}catch(e){}}};
+let best=store.get('best',{}), mistakes=store.get('mist',[]);
+/* ---------- утилиты ---------- */
+const $=s=>document.querySelector(s);
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g,' ').trim().replace(/[.!?,]+$/,'')
+  .replace(/\bhasn't\b/g,'has not').replace(/\bhaven't\b/g,'have not').replace(/\bdidn't\b/g,'did not').replace(/\b(\w+)'ve\b/g,'$1 have');
+const same=(x,list)=>list.some(a=>norm(a)===norm(x));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* ---------- главная ---------- */
+function renderHome(){
+  const t=$('#topics'); t.innerHTML='';
+  TOPICS.forEach(tp=>{
+    const b=document.createElement('button'); b.className='topic'; b.type='button';
+    const bs=best[tp.id]; b.innerHTML=`<h3>${RULES[tp.id].t}</h3><p>${tp.d}</p><div class="best">${bs?`Лучший результат: <b>${bs}%</b>`:'Ещё не пройдено'}</div>`;
+    b.onclick=()=>start(tp.id); t.appendChild(b);
+  });
+  const mix=document.createElement('button'); mix.className='topic special'; mix.type='button';
+  mix.innerHTML=`<h3>Смешанный тест</h3><p>15 случайных заданий из всех тем, как на контрольной.</p><div class="best">${best.mix?`Лучший результат: <b>${best.mix}%</b>`:'Ещё не пройдено'}</div>`;
+  mix.onclick=()=>start('mix'); t.appendChild(mix);
+  const me=document.createElement('button'); me.className='topic special'; me.type='button';
+  me.innerHTML=`<h3>Мои ошибки</h3><p>${mistakes.length?`Сохранено заданий: ${mistakes.length}. Ответишь верно — задание уйдёт из списка.`:'Пока пусто. Сюда попадают задания, в которых была ошибка.'}</p>`;
+  me.onclick=()=>{if(mistakes.length)start('mist')}; t.appendChild(me);
+  $('#rules').innerHTML=Object.values(RULES).map(r=>`<div><span class="rt">${r.t}</span>${r.r}</div>`).join('');
+}
+/* ---------- игра ---------- */
+let S=null;
+function keyOf(topic,it){return topic+'|'+(it.q||it.v||(it.w&&it.w.join(' '))||'story')}
+function start(id){
+  let items=[];
+  if(id==='mix'){
+    const pool=[];['ppps','did','hashave','order','short','jay','coll','forms'].forEach(t=>BANK[t].forEach(it=>pool.push({t,it})));
+    items=shuffle(pool).slice(0,15);
+  }else if(id==='mist'){
+    items=mistakes.map(k=>{const [t]=k.split('|');const it=BANK[t].find(x=>keyOf(t,x)===k);return it?{t,it}:null}).filter(Boolean);
+    if(!items.length){mistakes=[];store.set('mist',mistakes);renderHome();return}
+  }else{
+    let list=BANK[id]; if(id==='forms')list=shuffle(list).slice(0,10); else if(id!=='story')list=shuffle(list);
+    items=list.map(it=>({t:id,it}));
+  }
+  S={id,items,i:0,res:[],wrong:[]};
+  $('#tTitle').textContent=id==='mix'?'Смешанный тест':id==='mist'?'Мои ошибки':RULES[id].t;
+  $('#home').classList.add('hide'); $('#play').classList.remove('hide'); window.scrollTo(0,0);
+  show();
+}
+function dots(){$('#dots').innerHTML=S.items.map((_,k)=>`<span class="dot ${S.res[k]===true?'ok':S.res[k]===false?'bad':''} ${k===S.i?'cur':''}"></span>`).join('')}
+function show(){
+  dots(); const {t,it}=S.items[S.i]; const st=$('#stage');
+  const taskText={choice:'Выбери правильный вариант.',input:'Впиши глагол в нужной форме.',forms:'Впиши 2-ю и 3-ю формы глагола.',order:'Нажимай на слова по порядку, чтобы собрать предложение.',story:'Поставь глаголы в Past Simple или Present Perfect.'}[it.type];
+  let h=`<p class="task">${taskText}${['mix','mist','redo'].includes(S.id)?` Тема: ${RULES[t].t}.`:''}</p>`;
+  if(it.type==='choice'){
+    h+=`<p class="q">${H(it.q.replace('___','<span class="gap">…</span>'))}</p><div class="opts">`+it.o.map((o,k)=>`<button class="opt" type="button" data-k="${k}"><span class="k">${k+1}</span><span>${o}</span></button>`).join('')+`</div>`;
+  }else if(it.type==='input'){
+    h+=`<p class="q">${H(it.q.replace('___','<span class="gap">…</span>'))}</p><div class="inrow"><input class="inp" id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ"><button class="btn" id="chk" type="button">Проверить</button></div>`;
+  }else if(it.type==='forms'){
+    h+=`<div class="forms"><div class="v1">${it.v}</div><div><label for="f2">2-я форма (Past Simple)</label><input class="inp" id="f2" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div><label for="f3">3-я форма (V3)</label><input class="inp" id="f3" autocomplete="off" autocapitalize="off" spellcheck="false"></div></div><div class="actions"><button class="btn" id="chk" type="button">Проверить</button></div>`;
+  }else if(it.type==='order'){
+    h+=`<div class="tiles answer" id="ansT" aria-label="Твоё предложение"></div><div class="tiles" id="poolT"></div><div class="actions"><button class="btn" id="chk" type="button">Проверить</button><button class="btn ghost" id="clr" type="button">Начать заново</button></div>`;
+  }else if(it.type==='story'){
+    let n=0; h+=`<div class="story">`+it.parts.map(p=>typeof p==='string'?H(p):`<input data-n="${n++}" aria-label="Пропуск ${n}" autocomplete="off" autocapitalize="off" spellcheck="false"> <small>(${esc(p.v)})</small>`).join('')+`</div><div class="actions"><button class="btn" id="chk" type="button">Проверить</button></div>`;
+  }
+  h+=`<div class="actions" id="hintRow"><button class="btn ghost" id="hint" type="button">Показать правило</button></div><div id="fb"></div>`;
+  st.innerHTML=h;
+  $('#hint').onclick=()=>{$('#hintRow').innerHTML=`<div class="rule">${RULES[t].r}</div>`};
+  if(it.type==='choice')st.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(+b.dataset.k===it.a,b));
+  if(it.type==='input'){const inp=$('#ans');inp.focus();$('#chk').onclick=()=>{if(inp.value.trim())answer(same(inp.value,it.acc),inp)};inp.onkeydown=e=>{if(e.key==='Enter')$('#chk').click()}}
+  if(it.type==='forms'){$('#f2').focus();$('#chk').onclick=()=>{const a=$('#f2').value,b=$('#f3').value;if(!a.trim()||!b.trim())return;const ok2=same(a,it.a2.flatMap(x=>x.split('/'))),ok3=same(b,it.a3);$('#f2').classList.add(ok2?'right':'wrong');$('#f3').classList.add(ok3?'right':'wrong');answer(ok2&&ok3,null)};['#f2','#f3'].forEach(s=>$(s).onkeydown=e=>{if(e.key==='Enter')$('#chk').click()})}
+  if(it.type==='order'){
+    let pool=shuffle(it.w.map((w,k)=>({w,k}))); for(let g=0;g<10&&pool.every((p,j)=>p.k===j);g++)pool=shuffle(pool); let pick=[];
+    const draw=()=>{$('#ansT').innerHTML=pick.map((p,j)=>`<button class="tile" type="button" data-j="${j}">${p.w}</button>`).join('');$('#poolT').innerHTML=pool.filter(p=>!pick.includes(p)).map(p=>`<button class="tile" type="button" data-k="${p.k}">${p.w}</button>`).join('');
+      $('#poolT').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{pick.push(pool.find(p=>p.k==b.dataset.k));draw()});
+      $('#ansT').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{pick.splice(+b.dataset.j,1);draw()})};
+    draw(); $('#clr').onclick=()=>{pick=[];draw()};
+    $('#chk').onclick=()=>{if(pick.length<it.w.length)return;answer(pick.map(p=>p.w).join(' ')===it.w.join(' '),null)};
+  }
+  if(it.type==='story'){
+    const ins=[...st.querySelectorAll('.story input')]; ins[0].focus();
+    $('#chk').onclick=()=>{
+      const gaps=it.parts.filter(p=>typeof p!=='string'); let ok=0; const lines=[];
+      ins.forEach((inp,k)=>{const g=gaps[k];const r=same(inp.value,g.a);inp.classList.add(r?'right':'wrong');inp.disabled=true;if(r)ok++;else lines.push(`${k+1}) <span class="ans">${g.a[0]}</span> — ${it.why[k]}`)});
+      S.storyScore=[ok,gaps.length]; answer(ok===gaps.length,null,lines);
+    };
+  }
+}
+function answer(ok,el,storyLines){
+  const {t,it}=S.items[S.i]; if(S.res[S.i]!==undefined)return;
+  S.res[S.i]=ok; const k=keyOf(t,it);
+  if(!ok){S.wrong.push({t,it});if(!mistakes.includes(k))mistakes.push(k)}else if(S.id==='mist'||mistakes.includes(k)){mistakes=mistakes.filter(x=>x!==k)}
+  store.set('mist',mistakes);
+  let right='';
+  if(it.type==='choice'){document.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;if(j===it.a)b.classList.add('right');else if(b===el)b.classList.add('wrong')});right=it.o[it.a]}
+  if(it.type==='input'){el.classList.add(ok?'right':'wrong');el.disabled=true;right=it.acc[0]}
+  if(it.type==='forms'){right=`${it.v} – ${it.a2[0]} – ${it.a3.join(' / ')}`}
+  if(it.type==='order'){right=it.w.join(' ')}
+  const chk=document.getElementById('chk'); if(chk)chk.remove(); const clr=document.getElementById('clr'); if(clr)clr.remove();
+  let body;
+  if(it.type==='story'){const [a,b]=S.storyScore;body=`<b class="v">${ok?'Всё верно!':`Верно ${a} из ${b}.`}</b>${storyLines&&storyLines.length?'Как правильно:<br>'+storyLines.join('<br>'):''}`}
+  else body=`<b class="v">${ok?'Верно!':'Неверно.'}</b>${ok?'':`Правильно: <span class="ans">${right}</span><br>`}${it.e}`;
+  const last=S.i===S.items.length-1;
+  $('#hintRow').remove();
+  $('#fb').innerHTML=`<div class="fb ${ok?'':'bad'}" role="status">${body}</div><div class="rule">${RULES[t].r}</div><div class="actions"><button class="btn" id="next" type="button">${last?'Показать итог':'Дальше'}</button></div>`;
+  dots(); const nx=$('#next'); nx.focus(); nx.onclick=()=>{if(last)summary();else{S.i++;show()}};
+}
+function summary(){
+  let ok=S.res.filter(Boolean).length,n=S.res.length;
+  if(S.id==='story'&&S.storyScore){[ok,n]=S.storyScore}
+  const p=Math.round(100*ok/n);
+  if(RULES[S.id]||S.id==='mix'){best[S.id]=Math.max(best[S.id]||0,p);store.set('best',best)}
+  const msg=p>=90?'Отлично — тема усвоена.':p>=70?'Хорошо. Повтори задания с ошибками.':'Перечитай правило и пройди тему ещё раз.';
+  $('#dots').innerHTML='';
+  $('#stage').innerHTML=`<div class="sum"><p class="task">Итог</p><div class="big" style="color:${p>=80?'var(--ok)':p>=50?'var(--ink)':'var(--bad)'}">${ok} / ${n}</div><p>${p}% · ${msg}</p>`+
+   (S.wrong.length&&S.id!=='story'?`<p style="margin-bottom:0">Ошибки (они сохранены в разделе «Мои ошибки»):</p><ul class="missed">${S.wrong.map(({it})=>`<li>${it.type==='forms'?`${it.v} – ${it.a2[0]} – ${it.a3[0]}`:it.type==='order'?it.w.join(' '):H((it.q||'').replace(/<small>.*?<\/small>/,'')).replace('___',`<b>${it.type==='choice'?it.o[it.a]:it.acc[0]}</b>`)}</li>`).join('')}</ul>`:'')+
+   `<div class="actions"><button class="btn" id="again" type="button">Пройти ещё раз</button>${S.wrong.length&&S.id!=='story'?'<button class="btn ghost" id="redo" type="button">Только ошибки</button>':''}<button class="btn ghost" id="home2" type="button">К темам</button></div></div>`;
+  $('#again').onclick=()=>start(S.id);
+  const r=$('#redo'); if(r)r.onclick=()=>{const w=S.wrong;S={id:'redo',items:w,i:0,res:[],wrong:[]};$('#tTitle').textContent='Работа над ошибками';show()};
+  $('#home2').onclick=goHome;
+}
+function goHome(){$('#play').classList.add('hide');$('#home').classList.remove('hide');renderHome();window.scrollTo(0,0)}
+$('#toHome').onclick=goHome;
+$('#reset').onclick=()=>{if(confirm('Сбросить лучшие результаты и список ошибок?')){best={};mistakes=[];store.set('best',best);store.set('mist',mistakes);renderHome()}};
+document.addEventListener('keydown',e=>{if(!S||$('#play').classList.contains('hide'))return;if(/^[1-4]$/.test(e.key)&&document.activeElement.tagName!=='INPUT'){const b=document.querySelector(`.opt[data-k="${+e.key-1}"]:not([disabled])`);if(b)b.click()}});
+renderHome();
+</script>
+</body>
+</html>
