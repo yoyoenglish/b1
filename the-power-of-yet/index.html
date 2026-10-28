@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The power of yet — B1 vocabulary trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1D2766; --sky:#2FA9D6; --sky-soft:#E8F5FB; --paper:#FFFFFF; --pen:#E0362C;
+  --ok:#1E8E5A; --ok-soft:#E3F5EC; --bad:#C9352B; --bad-soft:#FCE9E7;
+  --muted:#5B6488; --line:#D5E6EF; --card:#FFFFFF;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#E6EBFF; --sky:#5CC4EA; --sky-soft:#16213F; --paper:#0E1530; --pen:#FF5A4E;
+    --ok:#4FD49A; --ok-soft:#123528; --bad:#FF7A70; --bad-soft:#3A1916;
+    --muted:#A3ACD0; --line:#26335C; --card:#141D3D;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#E6EBFF; --sky:#5CC4EA; --sky-soft:#16213F; --paper:#0E1530; --pen:#FF5A4E;
+  --ok:#4FD49A; --ok-soft:#123528; --bad:#FF7A70; --bad-soft:#3A1916;
+  --muted:#A3ACD0; --line:#26335C; --card:#141D3D;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  font-size:18px;line-height:1.5}
+h1,h2,h3,.display{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;padding:0 18px}
+
+/* red pen underline — like the teacher's marks in the book */
+.pen{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8 C 40 3, 90 10, 130 6 S 185 4, 198 7' fill='none' stroke='%23E0362C' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:0 100%;background-size:100% .38em;padding-bottom:.12em}
+
+header.hero{padding:34px 0 18px}
+.hero h1{font-size:clamp(34px,7vw,60px);line-height:1.02;margin:0 0 10px;font-weight:800;letter-spacing:-.02em}
+.hero h1 .yet{position:relative;display:inline-block;color:var(--pen)}
+.hero h1 .yet svg{position:absolute;left:-4%;bottom:-.18em;width:108%;height:.32em;overflow:visible}
+.hero h1 .yet path{stroke:var(--pen);stroke-dasharray:240;stroke-dashoffset:240;animation:draw 1s .5s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion: reduce){.hero h1 .yet path{animation:none;stroke-dashoffset:0}}
+.hero p{margin:0;color:var(--muted);max-width:60ch}
+
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:2px solid var(--line);margin-bottom:22px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.tabs .wrap{display:flex;gap:4px;overflow-x:auto;padding-top:8px;padding-bottom:0}
+.tab{border:0;background:none;padding:10px 12px 12px;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;color:var(--muted);font-weight:700}
+.tab .n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--sky-soft);color:var(--ink);font-size:14px;margin-right:6px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--sky)}
+.tab[aria-selected="true"] .n{background:var(--sky);color:#fff}
+.tab .sc{font-weight:400;font-size:14px;margin-left:4px}
+
+section.panel{display:none;padding-bottom:60px}
+section.panel.on{display:block}
+.panel h2{font-size:28px;margin:0 0 4px}
+.task{color:var(--muted);margin:0 0 20px}
+
+/* flashcards */
+.deck{display:flex;flex-direction:column;align-items:center;gap:16px}
+.card{width:100%;max-width:560px;height:320px;perspective:1200px;border:0;background:none;padding:0}
+.card-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.card.flipped .card-in{transform:rotateY(180deg)}
+@media (prefers-reduced-motion: reduce){.card-in{transition:none}}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;border:2px solid var(--line);background:var(--card);padding:26px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:14px}
+.face.back{transform:rotateY(180deg);background:var(--sky-soft)}
+.face .term{font-family:"Bricolage Grotesque",sans-serif;font-size:clamp(28px,5vw,40px);font-weight:800;line-height:1.15}
+.face .hint{position:absolute;bottom:14px;font-size:14px;color:var(--muted)}
+.face .def{font-size:21px;font-weight:700;max-width:34ch}
+.face .ex{font-style:italic;color:var(--muted)}
+.ru-line{min-height:1.5em;font-weight:700;color:var(--pen)}
+.icon-btn{width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:var(--paper);display:inline-grid;place-items:center;font-size:20px}
+.icon-btn.small{width:38px;height:38px;font-size:16px}
+.ru-btn{width:40px;height:40px;border-radius:50%;border:2px solid var(--pen);background:var(--paper);color:var(--pen);font-weight:700;font-size:14px;position:absolute;top:14px;right:14px}
+.say-row{display:flex;gap:10px;align-items:center;justify-content:center}
+.deck-nav{display:flex;gap:10px;align-items:center}
+.btn{border:2px solid var(--ink);background:var(--paper);border-radius:12px;padding:9px 16px;font-weight:700}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn:disabled{opacity:.4;cursor:default}
+.count{min-width:70px;text-align:center;color:var(--muted)}
+
+/* feedback */
+.fb{margin-top:10px;padding:10px 14px;border-radius:10px;font-size:16px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.fb b{color:inherit}
+
+/* match */
+.match{display:grid;grid-template-columns:1fr 1.5fr;gap:12px}
+.col{display:flex;flex-direction:column;gap:10px}
+.tile{border:2px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px;text-align:left;font-size:17px}
+.tile.term{font-weight:700}
+.tile.sel{border-color:var(--sky);background:var(--sky-soft)}
+.tile.done{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);cursor:default}
+.tile.wrong{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (prefers-reduced-motion: reduce){.tile.wrong{animation:none}}
+.round-bar{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;flex-wrap:wrap}
+
+/* questions */
+ol.qs{list-style:none;padding:0;margin:0;counter-reset:q}
+ol.qs>li{counter-increment:q;padding:16px 0;border-bottom:1px solid var(--line)}
+ol.qs>li::before{content:counter(q);display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--sky-soft);font-weight:700;font-size:14px;margin-right:10px;vertical-align:top}
+.qtext{display:inline;font-size:19px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-left:38px}
+.opt{border:2px solid var(--line);background:var(--card);border-radius:10px;padding:7px 14px}
+.opt.right{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);font-weight:700}
+.opt.picked-wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);text-decoration:line-through}
+.qs .fb{margin-left:38px}
+
+/* gap fill */
+.gap{display:inline-block;width:auto;min-width:9ch;border:0;border-bottom:2px dashed var(--sky);background:transparent;color:var(--ink);font:inherit;font-weight:700;padding:0 4px;text-align:center}
+.gap.okay{border-bottom:2px solid var(--ok);color:var(--ok)}
+.gap.no{border-bottom-color:var(--bad)}
+.gap-tools{display:flex;gap:8px;margin-top:10px;padding-left:38px;flex-wrap:wrap}
+.btn.sm{padding:5px 12px;font-size:15px;border-radius:9px}
+
+/* build */
+.answer-line{min-height:54px;border:2px dashed var(--line);border-radius:12px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 8px 38px}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin-left:38px}
+.chip{border:2px solid var(--ink);background:var(--card);border-radius:9px;padding:5px 11px;font-size:17px}
+.answer-line .chip{background:var(--sky-soft);border-color:var(--sky)}
+.answer-line.ok{border-style:solid;border-color:var(--ok)}
+.build-tools{display:flex;gap:8px;margin:10px 0 0 38px}
+
+.summary{margin-top:24px;padding:16px;border-radius:14px;background:var(--sky-soft);font-weight:700;display:none}
+.summary.show{display:block}
+footer{border-top:2px solid var(--line);padding:18px 0 30px;color:var(--muted);font-size:15px}
+
+@media (max-width:640px){
+  body{font-size:17px}
+  .match{grid-template-columns:1fr 1.35fr;gap:8px}
+  .tile{font-size:15px;padding:9px 10px}
+  .opts,.gap-tools,.bank,.build-tools{padding-left:0;margin-left:0}
+  .answer-line{margin-left:0}
+  .qs .fb{margin-left:0}
+  .card{height:340px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>I can’t do it <span class="yet">yet<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 40 3, 90 10, 130 6 S 185 4, 198 7" fill="none" stroke-width="5" stroke-linecap="round"/></svg></span>.</h1>
+    <p>Active words and phrases from the text about the power of “yet”. Level B1. Go through the five steps in order.</p>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Steps">
+  <div class="wrap" role="tablist">
+    <button class="tab" role="tab" data-t="cards" aria-selected="true"><span class="n">1</span>Cards</button>
+    <button class="tab" role="tab" data-t="match" aria-selected="false"><span class="n">2</span>Match<span class="sc" id="sc-match"></span></button>
+    <button class="tab" role="tab" data-t="choose" aria-selected="false"><span class="n">3</span>Choose<span class="sc" id="sc-choose"></span></button>
+    <button class="tab" role="tab" data-t="complete" aria-selected="false"><span class="n">4</span>Complete<span class="sc" id="sc-complete"></span></button>
+    <button class="tab" role="tab" data-t="build" aria-selected="false"><span class="n">5</span>Build<span class="sc" id="sc-build"></span></button>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section class="panel on" id="p-cards">
+    <h2>Word cards</h2>
+    <p class="task">Listen to each word. Tap the card to see what it means. On the back, tap RU for the Russian translation.</p>
+    <div class="deck">
+      <div class="card" id="card" tabindex="0" role="button" aria-label="Flip the card">
+        <div class="card-in">
+          <div class="face front">
+            <div class="term"><span class="pen" id="c-term"></span></div>
+            <div class="say-row"><button class="icon-btn" id="c-say" aria-label="Listen to the word">🔊</button></div>
+            <div class="hint">Tap the card to flip it</div>
+          </div>
+          <div class="face back">
+            <button class="ru-btn" id="c-ru" aria-label="Show Russian translation">RU</button>
+            <div class="def" id="c-def"></div>
+            <div class="say-row"><span class="ex" id="c-ex"></span><button class="icon-btn small" id="c-say-ex" aria-label="Listen to the example">🔊</button></div>
+            <div class="ru-line" id="c-ruline"></div>
+          </div>
+        </div>
+      </div>
+      <div class="deck-nav">
+        <button class="btn" id="c-prev">Back</button>
+        <span class="count" id="c-count"></span>
+        <button class="btn primary" id="c-next">Next</button>
+      </div>
+      <button class="btn sm" id="c-shuffle">Shuffle the cards</button>
+    </div>
+  </section>
+
+  <section class="panel" id="p-match">
+    <h2>Match</h2>
+    <p class="task">Tap a word on the left, then tap its meaning on the right.</p>
+    <div class="match"><div class="col" id="m-left"></div><div class="col" id="m-right"></div></div>
+    <div class="fb" id="m-fb"></div>
+    <div class="round-bar"><span class="count" id="m-round"></span><button class="btn primary" id="m-next" disabled>Next round</button></div>
+    <div class="summary" id="m-sum"></div>
+  </section>
+
+  <section class="panel" id="p-choose">
+    <h2>Choose the right word</h2>
+    <p class="task">Choose the word that fits the sentence. Think about prepositions and word forms.</p>
+    <ol class="qs" id="ch-list"></ol>
+    <div class="summary" id="ch-sum"></div>
+  </section>
+
+  <section class="panel" id="p-complete">
+    <h2>Complete the sentences</h2>
+    <p class="task">Write the missing words. Change the form if you need to. Press Enter or Check.</p>
+    <ol class="qs" id="g-list"></ol>
+    <div class="summary" id="g-sum"></div>
+  </section>
+
+  <section class="panel" id="p-build">
+    <h2>Build the sentence</h2>
+    <p class="task">Tap the words in the right order. Tap a word in the line to send it back.</p>
+    <ol class="qs" id="b-list"></ol>
+    <div class="summary" id="b-sum"></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Yo Yo English. Definitions for “growth mindset” and “fixed mindset” follow the Oxford Learner’s Dictionaries.</div></footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- DATA ---------- */
+var WORDS = [
+ {en:"be full of", say:"be full of", def:"to have a lot of something inside or in it", ex:"Her schoolbag is always full of snacks.", ru:"быть полным чего-либо"},
+ {en:"impossible", say:"impossible", def:"cannot happen or cannot be done", ex:"It’s impossible to learn a language in one day.", ru:"невозможный"},
+ {en:"find yourself doing something", say:"find yourself doing something", def:"to notice that you are doing something without planning to do it", ex:"I found myself singing that song all day.", ru:"поймать себя на том, что делаешь что-то"},
+ {en:"introduce yourself to something", say:"introduce yourself to something", def:"to try or learn about something new for the first time", ex:"This year I introduced myself to chess.", ru:"познакомиться с чем-то новым"},
+ {en:"by + -ing (by adding)", say:"by adding", def:"shows the way you do something or how something happens", ex:"You can save money by cooking at home.", ru:"путём / с помощью (by adding — добавив)"},
+ {en:"suddenly", say:"suddenly", def:"very quickly, when you don’t expect it", ex:"Suddenly, all the lights went out.", ru:"вдруг, внезапно"},
+ {en:"the impossible becomes possible", say:"the impossible becomes possible", def:"something you thought could never happen starts to happen", ex:"With a good team, the impossible becomes possible.", ru:"невозможное становится возможным"},
+ {en:"mark (exams)", say:"mark exams", def:"to check students’ work, find the mistakes and give it a score", ex:"Teachers often mark tests at home in the evening.", ru:"проверять и оценивать (работы)"},
+ {en:"exam", say:"exam", def:"an official test that shows how much you know", ex:"I have a history exam tomorrow.", ru:"экзамен"},
+ {en:"recognise (that)", say:"recognise", def:"to accept that something is true", ex:"He recognised that he was wrong and said sorry.", ru:"признавать, осознавать (что…)"},
+ {en:"feel like (a failure)", say:"feel like a failure", def:"to think you seem to be a certain kind of person because of what happened", ex:"When everyone laughed, I felt like a clown.", ru:"чувствовать себя (кем-то)"},
+ {en:"failure", say:"failure", def:"a person or thing that is not successful", ex:"The party was a disaster — nobody came. Total failure!", ru:"неудача; неудачник"},
+ {en:"not yet", say:"not yet", def:"so far no, but maybe later", ex:"“Have you finished?” “Not yet!”", ru:"ещё нет, пока нет"},
+ {en:"instead", say:"instead", def:"in the place of someone or something else", ex:"There was no milk, so I drank juice instead.", ru:"вместо этого"},
+ {en:"concentrate on", say:"concentrate on", def:"to give all your attention to one thing", ex:"I can’t concentrate on my homework when it’s noisy.", ru:"сосредоточиться на"},
+ {en:"a growth mindset", say:"a growth mindset", def:"the belief that you can get better at things by working hard and listening to advice", ex:"With a growth mindset, mistakes help you learn.", ru:"установка на рост, мышление роста"},
+ {en:"a fixed mindset", say:"a fixed mindset", def:"the belief that your natural abilities can’t change, even if you work hard", ex:"People with this way of thinking often give up quickly.", ru:"фиксированное мышление («я такой, какой есть»)"}
+];
+
+var CHOOSE = [
+ {q:"My little sister’s room is ___ of soft toys.", o:["full","fill","filled"], a:"full",
+  ok:"Верно! «Be full of something» — быть полным чего-то. После full всегда идёт of.",
+  bad:"Не совсем. Нужно прилагательное full: «be full of» — быть полным чего-то. Fill — это глагол «наполнять»."},
+ {q:"Last night I found myself ___ about the test for hours.", o:["think","thinking","to think"], a:"thinking",
+  ok:"Отлично! После «find yourself» глагол идёт с -ing: I found myself thinking — я поймал себя на том, что думаю.",
+  bad:"Почти. После «find yourself» нужна форма -ing: found myself thinking."},
+ {q:"This summer I introduced myself ___ rock climbing.", o:["with","to","for"], a:"to",
+  ok:"Правильно! «Introduce yourself to something» — познакомиться с чем-то новым. Предлог — to.",
+  bad:"Нет. В английском «знакомятся» к чему-то: introduce yourself to something. Не with, хотя по-русски «с»."},
+ {q:"She improved her English ___ songs every day.", o:["by listening to","by listen to","for listening"], a:"by listening to",
+  ok:"Да! «By + -ing» показывает способ: by listening — слушая, с помощью прослушивания.",
+  bad:"Не совсем. После by глагол стоит с -ing: by listening to songs — слушая песни."},
+ {q:"Please turn off the TV. I need to concentrate ___ my essay.", o:["in","at","on"], a:"on",
+  ok:"Верно! «Concentrate on» — сосредоточиться на чём-то. Только on.",
+  bad:"Нет. С concentrate используем on: concentrate on my essay."},
+ {q:"After the match he felt ___ a real hero.", o:["as","like","so"], a:"like",
+  ok:"Отлично! «Feel like + существительное» — чувствовать себя кем-то: felt like a hero.",
+  bad:"Почти. Перед существительным говорим feel like: felt like a hero. «Feel as» здесь звучит неестественно."},
+ {q:"There was nothing good on TV, so we played a board game ___.", o:["instead of","instead","suddenly"], a:"instead",
+  ok:"Правильно! Instead в конце фразы = «вместо этого». «Instead of» нужен, только если дальше идёт существительное: instead of TV.",
+  bad:"Не совсем. В конце предложения, без слова после, ставим просто instead. «Instead of» требует продолжения: instead of watching TV."},
+ {q:"Our teacher ___ our tests at the weekend and gave them back on Monday.", o:["marked","noticed","signed"], a:"marked",
+  ok:"Верно! «Mark tests / exams» — проверять и оценивать работы.",
+  bad:"Нет. Проверять и ставить оценку за работу — это mark. Notice — замечать, sign — подписывать."},
+ {q:"My first cake was a total ___. It was black and hard!", o:["fail","failure","failed"], a:"failure",
+  ok:"Да! Нужно существительное: a failure — неудача, провал.",
+  bad:"Не совсем. После «a total» нужно существительное: failure. Fail — глагол, failed — прошедшее время."},
+ {q:"People with a ___ mindset often give up when things get hard.", o:["growth","fixed","full"], a:"fixed",
+  ok:"Верно! Fixed mindset — убеждение, что способности не меняются, поэтому такие люди быстро сдаются.",
+  bad:"Нет. Сдаются быстро люди с fixed mindset. Growth mindset — наоборот, вера, что можно стать лучше."},
+ {q:"Tom finally ___ that he needed help with maths.", o:["recognised","concentrated","introduced"], a:"recognised",
+  ok:"Отлично! «Recognise that…» — признать, осознать, что…",
+  bad:"Не совсем. «Признал, что ему нужна помощь» — recognised that. Остальные глаголы не сочетаются с that в этом значении."},
+ {q:"We were sitting in the park when ___ it started to snow.", o:["suddenly","instead","yet"], a:"suddenly",
+  ok:"Правильно! Suddenly — вдруг, внезапно.",
+  bad:"Нет. Здесь нужно «вдруг» — suddenly."}
+];
+
+var GAPS = [
+ {pre:"I often ", post:" checking my phone in the middle of the night.", ans:["find myself"], hint:"f… m…",
+  ok:"Верно! Find myself + -ing: ловлю себя на том, что проверяю телефон.",
+  bad:"Подсказка: нужно выражение «поймать себя на том, что…»: глагол find + возвратное местоимение для I."},
+ {pre:"You can learn a lot of new words ", post:" films with English subtitles.", ans:["by watching"], hint:"b… w…",
+  ok:"Отлично! By + -ing показывает способ: by watching — смотря фильмы.",
+  bad:"Подсказка: способ действия — предлог + глагол «смотреть» с окончанием -ing."},
+ {pre:"We were playing volleyball when ", post:" it started to rain.", ans:["suddenly"], hint:"s…",
+  ok:"Верно! Suddenly — вдруг.",
+  bad:"Подсказка: слово «вдруг, внезапно» начинается на s."},
+ {pre:"Ms Brown ", post:" our tests last night, and we got them back today.", ans:["marked"], hint:"m…",
+  ok:"Правильно! Marked — проверила и оценила. Прошедшее время, потому что last night.",
+  bad:"Подсказка: «проверять и оценивать» = mark. Действие было вчера — нужно прошедшее время."},
+ {pre:"Anna finally ", post:" that she needed more practice.", ans:["recognised","recognized"], hint:"r…",
+  ok:"Верно! Recognised (брит.) / recognized (амер.) — признала, осознала.",
+  bad:"Подсказка: «признать, осознать, что…» = recognise. Нужно прошедшее время."},
+ {pre:"When I lost the race, I ", post:" a failure.", ans:["felt like"], hint:"f… l…",
+  ok:"Отлично! Felt like a failure — почувствовал себя неудачником. Feel → felt.",
+  bad:"Подсказка: «почувствовал себя кем-то» — feel + предлог перед существительным, и всё в прошедшем времени (feel — неправильный глагол)."},
+ {pre:"The bus didn’t come, so we walked ", post:".", ans:["instead"], hint:"i…",
+  ok:"Верно! Instead — вместо этого.",
+  bad:"Подсказка: «вместо этого» в конце предложения — одно слово на i."},
+ {pre:"It’s hard to ", post:" your homework when your phone is next to you.", ans:["concentrate on"], hint:"c… o…",
+  ok:"Правильно! Concentrate on — сосредоточиться на.",
+  bad:"Подсказка: «сосредоточиться на» — глагол на c + нужный предлог (не in и не at)."},
+ {pre:"“Can you play the guitar?” “", post:", but I’m learning!”", ans:["not yet"], hint:"N… y…",
+  ok:"Отлично! Not yet — пока нет. Сила слова yet!",
+  bad:"Подсказка: «пока нет» — два слова, главное слово этого текста."},
+ {pre:"People with a ", post:" believe that practice makes them better.", ans:["growth mindset"], hint:"g… m…",
+  ok:"Верно! Growth mindset — вера, что можно развиваться через усилия.",
+  bad:"Подсказка: это противоположность fixed mindset — два слова на g и m."},
+ {pre:"The old fridge is ", post:" food we never eat.", ans:["full of"], hint:"f… o…",
+  ok:"Правильно! Full of — полный чего-то.",
+  bad:"Подсказка: «полный чего-то» — прилагательное + предлог (два слова)."},
+ {pre:"Our small team won the cup. The ", post:" became possible!", ans:["impossible"], hint:"i…",
+  ok:"Отлично! The impossible became possible — невозможное стало возможным.",
+  bad:"Подсказка: противоположность слова possible."},
+ {pre:"Last year I ", post:" to skateboarding, and now I ride every day.", ans:["introduced myself"], hint:"i… m…",
+  ok:"Верно! Introduced myself to skateboarding — познакомился со скейтбордингом.",
+  bad:"Подсказка: «познакомился с чем-то новым» — introduce + возвратное местоимение для I, в прошедшем времени."},
+ {pre:"We have three ", post:" next week: maths, history and English.", ans:["exams"], hint:"e…",
+  ok:"Правильно! Exams — экзамены, во множественном числе, потому что three.",
+  bad:"Подсказка: «экзамены» — и не забудь множественное число после three."}
+];
+
+var BUILD = [
+ {w:["Suddenly,","the","impossible","became","possible."],
+  ok:"Верно! Suddenly часто стоит в начале предложения и отделяется запятой.",
+  bad:"Не совсем. Начни с Suddenly, затем — кто/что (the impossible) и что произошло (became possible)."},
+ {w:["I","often","find","myself","thinking","about","the","weekend."],
+  ok:"Отлично! Often стоит перед смысловым глаголом: I often find myself…",
+  bad:"Подсказка: подлежащее I → often → find myself → thinking about…"},
+ {w:["She","improved","her","English","by","reading","every","day."],
+  ok:"Правильно! By reading — способ, которым она улучшила английский.",
+  bad:"Подсказка: сначала что она сделала (improved her English), потом как (by reading), потом когда."},
+ {w:["Try","to","concentrate","on","what","you","can","do."],
+  ok:"Верно! Concentrate on what you can do — сосредоточься на том, что ты можешь.",
+  bad:"Подсказка: Try to concentrate on… — после on идёт то, на чём сосредоточиться."},
+ {w:["He","felt","like","a","failure","after","the","exam."],
+  ok:"Отлично! Felt like a failure after the exam.",
+  bad:"Подсказка: He felt like + a failure, а в конце — когда это было."},
+ {w:["The","school","doesn’t","give","an","F.","It","writes","‘Not","yet’","instead."],
+  ok:"Правильно! Instead стоит в конце: вместо F школа пишет ‘Not yet’.",
+  bad:"Подсказка: два предложения. Первое заканчивается на an F., второе — словом instead."}
+];
+
+/* ---------- HELPERS ---------- */
+function $(id){return document.getElementById(id)}
+function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function norm(s){return String(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/[.!?,;:“”"]/g,"").replace(/\s+/g," ").trim()}
+function showFb(box,ok,text){box.className="fb show "+(ok?"ok":"bad");box.textContent=text}
+
+/* speech */
+var voice=null;
+function pickVoice(){
+  if(!("speechSynthesis" in window))return;
+  var vs=speechSynthesis.getVoices();
+  voice=vs.find(function(v){return v.lang==="en-GB"})||vs.find(function(v){return /^en/i.test(v.lang)})||null;
+}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function speak(t){
+  if(!("speechSynthesis" in window))return;
+  speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(t.replace(/[“”]/g,""));
+  u.lang="en-GB";u.rate=.9;if(voice)u.voice=voice;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- TABS ---------- */
+var tabs=document.querySelectorAll(".tab");
+tabs.forEach(function(t){t.addEventListener("click",function(){
+  tabs.forEach(function(x){x.setAttribute("aria-selected",x===t?"true":"false")});
+  document.querySelectorAll(".panel").forEach(function(p){p.classList.toggle("on",p.id==="p-"+t.dataset.t)});
+  window.scrollTo({top:0});
+})});
+
+/* ---------- 1. CARDS ---------- */
+var order=WORDS.slice(),ci=0,card=$("card");
+function renderCard(){
+  var w=order[ci];
+  card.classList.remove("flipped");
+  $("c-term").textContent=w.en;$("c-def").textContent=w.def;$("c-ex").textContent=w.ex;
+  $("c-ruline").textContent="";
+  $("c-count").textContent=(ci+1)+" / "+order.length;
+  $("c-prev").disabled=ci===0;$("c-next").disabled=ci===order.length-1;
+}
+card.addEventListener("click",function(){card.classList.toggle("flipped")});
+card.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();card.classList.toggle("flipped")}});
+$("c-say").addEventListener("click",function(e){e.stopPropagation();speak(order[ci].say)});
+$("c-say-ex").addEventListener("click",function(e){e.stopPropagation();speak(order[ci].ex)});
+$("c-ru").addEventListener("click",function(e){e.stopPropagation();var l=$("c-ruline");l.textContent=l.textContent?"":order[ci].ru});
+$("c-prev").addEventListener("click",function(){if(ci>0){ci--;renderCard()}});
+$("c-next").addEventListener("click",function(){if(ci<order.length-1){ci++;renderCard()}});
+$("c-shuffle").addEventListener("click",function(){order=shuffle(WORDS);ci=0;renderCard()});
+renderCard();
+
+/* ---------- 2. MATCH ---------- */
+var rounds=[],ri=0,mSel=null,mLeft=0,mScore=0,mTries=0;
+(function(){var s=shuffle(WORDS);for(var i=0;i<s.length;i+=6)rounds.push(s.slice(i,i+6))})();
+function renderRound(){
+  var L=$("m-left"),R=$("m-right"),set=rounds[ri];
+  L.innerHTML="";R.innerHTML="";mSel=null;mLeft=set.length;$("m-fb").className="fb";
+  set.forEach(function(w){
+    var b=el("button","tile term",w.en);b.dataset.en=w.en;
+    b.addEventListener("click",function(){
+      if(b.classList.contains("done"))return;
+      L.querySelectorAll(".tile").forEach(function(x){x.classList.remove("sel")});
+      b.classList.add("sel");mSel=w;speak(w.say);
+    });L.appendChild(b);
+  });
+  shuffle(set).forEach(function(w){
+    var b=el("button","tile",w.def);
+    b.addEventListener("click",function(){
+      if(b.classList.contains("done"))return;
+      if(!mSel){showFb($("m-fb"),false,"Сначала выбери слово слева, потом его значение справа.");return}
+      mTries++;
+      if(mSel===w){
+        mScore++;mLeft--;
+        b.classList.add("done");
+        L.querySelector('[data-en="'+CSS.escape(w.en)+'"]').classList.replace("sel","done");
+        showFb($("m-fb"),true,"Верно! «"+w.en+"» — "+w.ru+".");
+        mSel=null;
+        if(mLeft===0){
+          if(ri<rounds.length-1){$("m-next").disabled=false}
+          else{var s=$("m-sum");s.className="summary show";s.textContent="Все пары собраны! Ошибок: "+(mTries-WORDS.length)+". Переходи к шагу 3."}
+        }
+      }else{
+        b.classList.remove("wrong");void b.offsetWidth;b.classList.add("wrong");
+        showFb($("m-fb"),false,"Не совсем. «"+mSel.en+"» значит «"+mSel.ru+"», а это объяснение подходит к «"+w.en+"». Попробуй ещё раз.");
+      }
+      $("sc-match").textContent=mScore+"/"+WORDS.length;
+    });R.appendChild(b);
+  });
+  $("m-round").textContent="Round "+(ri+1)+" of "+rounds.length;
+  $("m-next").disabled=true;
+}
+$("m-next").addEventListener("click",function(){if(ri<rounds.length-1){ri++;renderRound()}});
+renderRound();
+
+/* ---------- 3. CHOOSE ---------- */
+var chDone=0,chRight=0;
+CHOOSE.forEach(function(it){
+  var li=el("li"),q=el("span","qtext",it.q),opts=el("div","opts"),fb=el("div","fb");
+  shuffle(it.o).forEach(function(o){
+    var b=el("button","opt",o);
+    b.addEventListener("click",function(){
+      if(li.dataset.done)return;li.dataset.done="1";chDone++;
+      var ok=o===it.a;if(ok)chRight++;
+      opts.querySelectorAll(".opt").forEach(function(x){if(x.textContent===it.a)x.classList.add("right")});
+      if(!ok)b.classList.add("picked-wrong");
+      showFb(fb,ok,ok?it.ok:it.bad);
+      speak(it.q.replace("___",it.a));
+      $("sc-choose").textContent=chRight+"/"+CHOOSE.length;
+      if(chDone===CHOOSE.length){var s=$("ch-sum");s.className="summary show";s.textContent="Готово! Правильно с первого раза: "+chRight+" из "+CHOOSE.length+"."}
+    });opts.appendChild(b);
+  });
+  li.append(q,opts,fb);$("ch-list").appendChild(li);
+});
+
+/* ---------- 4. COMPLETE ---------- */
+var gSolved=0,gFirst=0;
+GAPS.forEach(function(it){
+  var li=el("li"),q=el("span","qtext"),inp=el("input","gap");
+  inp.setAttribute("autocomplete","off");inp.setAttribute("autocapitalize","off");inp.setAttribute("spellcheck","false");
+  inp.setAttribute("aria-label","Missing words");inp.size=Math.max(it.ans[0].length+2,8);
+  q.append(document.createTextNode(it.pre),inp,document.createTextNode(it.post));
+  var tools=el("div","gap-tools"),chk=el("button","btn sm primary","Check"),hint=el("button","btn sm","Hint"),fb=el("div","fb");
+  var tries=0;
+  function check(){
+    if(li.dataset.done)return;
+    var v=norm(inp.value);if(!v){showFb(fb,false,"Сначала впиши ответ.");return}
+    tries++;
+    var ok=it.ans.some(function(a){return norm(a)===v});
+    if(ok){
+      li.dataset.done="1";gSolved++;if(tries===1)gFirst++;
+      inp.className="gap okay";inp.readOnly=true;showFb(fb,true,it.ok);
+      speak(it.pre+inp.value+it.post);
+      $("sc-complete").textContent=gSolved+"/"+GAPS.length;
+      if(gSolved===GAPS.length){var s=$("g-sum");s.className="summary show";s.textContent="Все предложения заполнены! С первой попытки: "+gFirst+" из "+GAPS.length+"."}
+    }else{inp.className="gap no";showFb(fb,false,it.bad+" Попробуй ещё раз.")}
+  }
+  chk.addEventListener("click",check);
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")check()});
+  hint.addEventListener("click",function(){showFb(fb,false,"Первые буквы: "+it.hint)});
+  tools.append(chk,hint);li.append(q,tools,fb);$("g-list").appendChild(li);
+});
+
+/* ---------- 5. BUILD ---------- */
+var bDone=0,bFirst=0;
+BUILD.forEach(function(it){
+  var li=el("li"),line=el("div","answer-line"),bank=el("div","bank"),tools=el("div","build-tools"),
+      chk=el("button","btn sm primary","Check"),rst=el("button","btn sm","Start again"),fb=el("div","fb"),tries=0;
+  line.setAttribute("aria-label","Your sentence");
+  function fill(){
+    line.innerHTML="";bank.innerHTML="";line.classList.remove("ok");
+    shuffle(it.w).forEach(function(w){
+      var c=el("button","chip",w);
+      c.addEventListener("click",function(){
+        if(li.dataset.done)return;
+        (c.parentNode===bank?line:bank).appendChild(c);
+      });bank.appendChild(c);
+    });
+  }
+  fill();
+  chk.addEventListener("click",function(){
+    if(li.dataset.done)return;
+    if(bank.children.length){showFb(fb,false,"Используй все слова — в банке ещё остались слова.");return}
+    tries++;
+    var got=[].map.call(line.children,function(c){return c.textContent}).join(" ");
+    if(got===it.w.join(" ")){
+      li.dataset.done="1";bDone++;if(tries===1)bFirst++;line.classList.add("ok");
+      showFb(fb,true,it.ok);speak(got);
+      $("sc-build").textContent=bDone+"/"+BUILD.length;
+      if(bDone===BUILD.length){var s=$("b-sum");s.className="summary show";s.textContent="Все предложения собраны! С первой попытки: "+bFirst+" из "+BUILD.length+". Отличная работа!"}
+    }else{showFb(fb,false,it.bad)}
+  });
+  rst.addEventListener("click",function(){if(!li.dataset.done){fill();fb.className="fb"}});
+  tools.append(chk,rst);li.append(line,bank,tools,fb);$("b-list").appendChild(li);
+});
+
+})();
+</script>
+</body>
+</html>
