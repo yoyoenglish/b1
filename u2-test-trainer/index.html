@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B1 · Тренажёр перед тестом</title>
+<style>
+  :root{
+    --ink:#1f2430; --muted:#6b7280; --line:#e5e7eb; --bg:#f7f7f9; --card:#fff;
+    --ps:#2563eb; --pp:#9333ea; --ok:#16a34a; --okbg:#ecfdf3; --bad:#dc2626; --badbg:#fef2f2;
+    --accent:#f5b400;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);margin:0 0 18px}
+  .tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .tab{flex:1;min-width:200px;border:2px solid var(--line);background:#fff;border-radius:12px;padding:12px 14px;font-size:16px;font-weight:600;cursor:pointer;text-align:left;color:var(--ink)}
+  .tab small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+  .tab.active{border-color:var(--accent);box-shadow:0 0 0 3px #fff3c4}
+  .part{display:none}.part.active{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+  details.cheat{background:#fffbea;border:1px solid #f3e3a1;border-radius:14px;padding:4px 18px;margin-bottom:18px}
+  details.cheat summary{cursor:pointer;font-weight:700;font-size:17px;padding:10px 0}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0}
+  @media(max-width:600px){.cols{grid-template-columns:1fr}}
+  .box{background:#fff;border-radius:10px;padding:12px;border-left:5px solid var(--ps)}
+  .box.pp{border-left-color:var(--pp)}
+  .box h3{margin:0 0 6px;font-size:16px}
+  .box.ps h3{color:var(--ps)} .box.pp h3{color:var(--pp)}
+  .box p{margin:4px 0;font-size:14.5px}
+  .formula{font-family:ui-monospace,Menlo,Consolas,monospace;background:#f3f4f6;border-radius:6px;padding:2px 6px;font-size:14px}
+  table{border-collapse:collapse;width:100%;font-size:14px;background:#fff;border-radius:10px;overflow:hidden;margin:8px 0}
+  th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+  th{background:#f3f4f6}
+  .warn{background:#fff;border-radius:10px;padding:10px 12px;margin:10px 0 14px;font-size:14.5px}
+  .warn b{color:var(--bad)}
+  .score{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0;display:flex;justify-content:space-between;align-items:center;font-weight:600}
+  .score button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px}
+  .qnum{font-size:13px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+  .hint{font-size:13.5px;color:var(--muted);margin:4px 0 10px}
+  .hint b{color:var(--ink)}
+  .sentence{font-size:18px;margin:6px 0 12px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{border:2px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font-size:16px;cursor:pointer;color:var(--ink)}
+  .opt:hover:not(:disabled){border-color:#c7cbd3}
+  .opt.ok{border-color:var(--ok);background:var(--okbg)}
+  .opt.bad{border-color:var(--bad);background:var(--badbg)}
+  .opt:disabled{cursor:default}
+  .typing{display:flex;gap:8px;flex-wrap:wrap}
+  .typing input{flex:1;min-width:180px;font-size:16px;padding:9px 12px;border:2px solid var(--line);border-radius:10px}
+  .typing input.ok{border-color:var(--ok);background:var(--okbg)}
+  .typing input.bad{border-color:var(--bad);background:var(--badbg)}
+  .typing button{border:none;background:var(--ink);color:#fff;border-radius:10px;padding:9px 16px;font-size:15px;cursor:pointer}
+  .typing button:disabled{opacity:.4;cursor:default}
+  .fb{display:none;margin-top:12px;border-radius:10px;padding:10px 12px;font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--okbg);border:1px solid #bbf7d0}
+  .fb.bad{background:var(--badbg);border:1px solid #fecaca}
+  .story{font-size:17.5px;line-height:2.1}
+  .gap{display:inline-flex;gap:3px;vertical-align:middle;background:#f3f4f6;border-radius:9px;padding:2px 3px;margin:0 2px}
+  .gap .num{font-size:11px;color:var(--muted);align-self:center;padding:0 3px;font-weight:700}
+  .gap button{border:1.5px solid var(--line);background:#fff;border-radius:7px;padding:1px 9px;font-size:15px;cursor:pointer;color:var(--ink);line-height:1.6}
+  .gap button.ok{border-color:var(--ok);background:var(--okbg);font-weight:700}
+  .gap button.bad{border-color:var(--bad);background:var(--badbg);text-decoration:line-through}
+  .gap button:disabled{cursor:default}
+  .storyfb{margin-top:10px}
+  .storyfb .fb{margin-top:6px}
+  .final{display:none;text-align:center;font-size:18px;font-weight:700;padding:16px}
+  .final.show{display:block}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-bottom:18px}
+  .fc{perspective:900px;height:170px;cursor:pointer}
+  .fc .in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+  .fc.flip .in{transform:rotateY(180deg)}
+  .fc .back{pointer-events:none}
+  .fc.flip .back{pointer-events:auto}
+  .fc.flip .front{pointer-events:none}
+  .fc .side{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+  .fc .back{transform:rotateY(180deg);background:#fffbea;border-color:#f3e3a1;font-size:14.5px}
+  .fc .word{font-size:22px;font-weight:700}
+  .fc .tap{font-size:12px;color:var(--muted);margin-top:6px}
+  .fc .exm{font-style:italic;color:#374151;margin-top:6px;font-size:13.5px}
+  .say{border:none;background:#f3f4f6;border-radius:50%;width:34px;height:34px;font-size:17px;cursor:pointer;margin-top:8px}
+  .ru{position:absolute;right:8px;bottom:8px;border:1.5px solid #d1d5db;background:#fff;border-radius:50%;width:32px;height:32px;font-size:11px;font-weight:700;cursor:pointer;color:var(--ink)}
+  .rutext{position:absolute;left:8px;bottom:12px;font-size:13.5px;font-weight:600;color:var(--pp);display:none}
+  .rutext.show{display:block}
+  .match{display:grid;grid-template-columns:1fr 2fr;gap:8px}
+  .match .col{display:flex;flex-direction:column;gap:6px}
+  .mi{border:2px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-size:14.5px;cursor:pointer;text-align:left;color:var(--ink)}
+  .mi.sel{border-color:var(--accent);background:#fff8dc}
+  .mi.done{border-color:var(--ok);background:var(--okbg);cursor:default;opacity:.75}
+  .mi.wrong{border-color:var(--bad);background:var(--badbg)}
+  h2.sec{font-size:18px;margin:22px 0 10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Тренажёр перед тестом · B1</h1>
+  <p class="sub">Сначала открой шпаргалку, потом делай задания. После каждого ответа появится объяснение.</p>
+
+  <div class="tabs">
+    <button class="tab active" data-part="p1">Часть 1<small>Past Simple vs Present Perfect</small></button>
+    <button class="tab" data-part="p2">Часть 2<small>Articles: a / an / the / —</small></button>
+    <button class="tab" data-part="p3">Часть 3<small>Active vocabulary: thinking verbs</small></button>
+  </div>
+
+  <!-- ================= PART 1 ================= -->
+  <section class="part active" id="p1">
+    <details class="cheat" open>
+      <summary>📌 Шпаргалка: Past Simple или Present Perfect?</summary>
+      <div class="cols">
+        <div class="box ps">
+          <h3>Past Simple</h3>
+          <p><span class="formula">V2 / V-ed</span> — I <b>saw</b>, she <b>played</b></p>
+          <p><span class="formula">didn't + V1</span> — I <b>didn't see</b></p>
+          <p><span class="formula">Did + V1?</span> — <b>Did</b> you <b>see</b>?</p>
+          <p><b>Когда?</b> Известно, <u>когда</u> это было, и время закончилось.</p>
+          <p><b>Маркеры:</b> yesterday, last week, ago, in 2020, when…?, then</p>
+        </div>
+        <div class="box pp">
+          <h3>Present Perfect</h3>
+          <p><span class="formula">have / has + V3</span> — I <b>have seen</b>, she <b>has played</b></p>
+          <p><span class="formula">haven't / hasn't + V3</span></p>
+          <p><span class="formula">Have / Has … V3?</span> — <b>Have</b> you <b>seen</b>?</p>
+          <p><b>Когда?</b> Неважно, когда. Важен <u>результат сейчас</u> или опыт в жизни.</p>
+          <p><b>Маркеры:</b> ever, never, just, already, yet, since, for, so far</p>
+        </div>
+      </div>
+      <div class="warn">
+        <b>Частые ошибки:</b><br>
+        ✗ I <s>have went</s> → ✓ I <b>have gone</b> (после have/has — только <b>V3</b>)<br>
+        ✗ She <s>have seen</s> → ✓ She <b>has seen</b> (he / she / it → <b>has</b>)<br>
+        ✗ I <s>have seen</s> it yesterday → ✓ I <b>saw</b> it yesterday (есть «когда» → Past Simple)
+      </div>
+      <table>
+        <tr><th>V1</th><th>V2 (Past Simple)</th><th>V3 (Present Perfect)</th></tr>
+        <tr><td>be</td><td>was / were</td><td>been</td></tr>
+        <tr><td>go</td><td>went</td><td>gone</td></tr>
+        <tr><td>see</td><td>saw</td><td>seen</td></tr>
+        <tr><td>do</td><td>did</td><td>done</td></tr>
+        <tr><td>eat</td><td>ate</td><td>eaten</td></tr>
+        <tr><td>write</td><td>wrote</td><td>written</td></tr>
+        <tr><td>ride</td><td>rode</td><td>ridden</td></tr>
+        <tr><td>break</td><td>broke</td><td>broken</td></tr>
+        <tr><td>steal</td><td>stole</td><td>stolen</td></tr>
+        <tr><td>lose</td><td>lost</td><td>lost</td></tr>
+        <tr><td>buy</td><td>bought</td><td>bought</td></tr>
+        <tr><td>know</td><td>knew</td><td>known</td></tr>
+        <tr><td>meet</td><td>met</td><td>met</td></tr>
+      </table>
+    </details>
+
+    <div class="score"><span>Правильно: <span id="s1">0</span> / <span id="t1">0</span></span><button onclick="resetPart('p1')">↺ Начать заново</button></div>
+    <div id="q1"></div>
+    <div class="final" id="f1"></div>
+  </section>
+
+  <!-- ================= PART 2 ================= -->
+  <section class="part" id="p2">
+    <details class="cheat" open>
+      <summary>📌 Шпаргалка: a / an / the / — (без артикля)</summary>
+      <div class="cols">
+        <div class="box ps">
+          <h3>a / an</h3>
+          <p>• Говорим о предмете <b>впервые</b>: I saw <b>a</b> dog.</p>
+          <p>• Один из многих: She lives in <b>a</b> small flat.</p>
+          <p>• Профессия: He's <b>an</b> engineer.</p>
+          <p><b>a</b> — перед согласным <u>звуком</u>: a cat, <b>a</b> university<br>
+             <b>an</b> — перед гласным <u>звуком</u>: an apple, <b>an</b> hour</p>
+        </div>
+        <div class="box pp">
+          <h3>the</h3>
+          <p>• Уже упоминали: <b>The</b> dog was friendly.</p>
+          <p>• Понятно, о чём речь: Close <b>the</b> door.</p>
+          <p>• Единственный в мире: <b>the</b> sun, <b>the</b> moon.</p>
+          <p>• Превосходная степень: <b>the</b> best, <b>the</b> tallest.</p>
+        </div>
+      </div>
+      <div class="box" style="border-left-color:#6b7280;margin-bottom:14px">
+        <h3 style="color:#374151">— без артикля</h3>
+        <p>• Множественное / неисчисляемое <b>в общем</b>: I love — cats. — Music helps me.</p>
+        <p>• Имена, города, большинство стран: — Tom, — London, — Russia.</p>
+        <p>• Приёмы пищи: have — breakfast / — lunch / — dinner.</p>
+        <p>• Транспорт с by: by — bus, by — train.</p>
+      </div>
+    </details>
+
+    <div class="score"><span>Правильно: <span id="s2">0</span> / <span id="t2">0</span></span><button onclick="resetPart('p2')">↺ Начать заново</button></div>
+    <div id="q2"></div>
+    <div class="final" id="f2"></div>
+  </section>
+  <!-- ================= PART 3 ================= -->
+  <section class="part" id="p3">
+    <h2 class="sec" style="margin-top:0">1. Карточки</h2>
+    <p class="hint">Нажми на карточку, чтобы перевернуть. 🔊 — послушать слово. <b>RU</b> — перевод.</p>
+    <div class="cards" id="cards"></div>
+    <div class="score"><span>Правильно: <span id="s3">0</span> / <span id="t3">0</span></span><button onclick="resetPart('p3')">↺ Начать заново</button></div>
+    <h2 class="sec">2. Match: слово ↔ объяснение</h2>
+    <p class="hint">Нажми на слово слева, потом на его объяснение справа.</p>
+    <div class="card"><div class="match"><div class="col" id="mw"></div><div class="col" id="md"></div></div><div class="fb" id="mfb"></div></div>
+    <h2 class="sec">3. Выбери слово</h2>
+    <div id="q3"></div>
+    <div class="final" id="f3"></div>
+  </section>
+</div>
+
+<script>
+/* ================= DATA: PART 1 ================= */
+const P1 = [
+  {type:'choice', s:'I ___ this film last weekend. (see)',
+   hint:'Есть точное время в прошлом? → Past Simple (V2).',
+   opts:['saw','have seen','have saw','seen'], a:'saw',
+   ex:'<b>last weekend</b> — точное прошедшее время, значит Past Simple: <b>saw</b> (V2). «have seen» здесь нельзя: с «last…» Present Perfect не используется.'},
+  {type:'choice', s:'___ you ever ___ to London? (be)',
+   hint:'<b>ever</b> = «когда-нибудь в жизни» → опыт → Present Perfect.',
+   opts:['Have … been','Did … be','Have … was','Were … ever'], a:'Have … been',
+   ex:'<b>ever</b> спрашивает про жизненный опыт → Present Perfect: <b>Have you ever been</b>. После have нужна 3-я форма: be → was → <b>been</b>.'},
+  {type:'choice', s:'She ___ her keys, so she can\'t open the door. (lose)',
+   hint:'Важен результат сейчас (не может открыть дверь) → Present Perfect. She → has.',
+   opts:['has lost','have lost','lost','has losed'], a:'has lost',
+   ex:'Результат виден <b>сейчас</b>: она не может открыть дверь → Present Perfect. <b>She → has</b>, а не have. lose → lost → <b>lost</b> (неправильный глагол, «losed» не бывает).'},
+  {type:'choice', s:'We ___ to the sea two years ago. (go)',
+   hint:'<b>ago</b> — маркер Past Simple.',
+   opts:['went','have gone','have went','gone'], a:'went',
+   ex:'<b>two years ago</b> — понятно, когда это было → Past Simple: <b>went</b>. «have went» — ошибка в любом случае: после have нужна V3 (gone).'},
+  {type:'choice', s:'I ___ my project yet. (not finish)',
+   hint:'<b>yet</b> в конце отрицания → Present Perfect.',
+   opts:['haven\'t finished','didn\'t finish','haven\'t finish','hasn\'t finished'], a:'haven\'t finished',
+   ex:'<b>yet</b> = «ещё (не)» → Present Perfect: <b>haven\'t finished</b>. С I — have (не has), и обязательно V3 с -ed.'},
+  {type:'choice', s:'When ___ you ___ learning English? (start)',
+   hint:'Вопрос <b>When…?</b> спрашивает о времени → Past Simple.',
+   opts:['did … start','have … started','did … started','have … start'], a:'did … start',
+   ex:'<b>When</b> спрашивает о конкретном моменте в прошлом → Past Simple. В вопросе с did глагол стоит в начальной форме: <b>did you start</b> (не «started»).'},
+  {type:'choice', s:'Look! Someone ___ my bike! (steal)',
+   hint:'<b>Look!</b> — мы видим результат прямо сейчас → Present Perfect.',
+   opts:['has stolen','stole','has stealed','have stolen'], a:'has stolen',
+   ex:'«Look!» — результат перед глазами (велосипеда нет) → Present Perfect. <b>Someone</b> — это он/она → <b>has</b>. steal → stole → <b>stolen</b>.'},
+  {type:'choice', s:'Shakespeare ___ many plays. (write)',
+   hint:'Шекспир жил давно, его жизнь закончилась → период закрыт.',
+   opts:['wrote','has written','has wrote','written'], a:'wrote',
+   ex:'Шекспира уже нет, он больше ничего не напишет → период закрыт → Past Simple: <b>wrote</b>. Сравни: <i>J.K. Rowling <b>has written</b> many books</i> — она жива и может написать ещё.'},
+  {type:'choice', s:'I ___ Max since 2019. (know)',
+   hint:'<b>since</b> = «с (какого-то момента) и до сих пор» → Present Perfect.',
+   opts:['have known','knew','know','have knew'], a:'have known',
+   ex:'<b>since 2019</b> — знаю с 2019 года и до сих пор → Present Perfect: <b>have known</b>. know → knew → <b>known</b>. «I know Max since…» — частая ошибка русскоговорящих.'},
+  {type:'type', s:'Have you ever ___ a horse? (ride)',
+   hint:'Впиши только <b>3-ю форму</b> глагола ride.',
+   a:['ridden'],
+   ex:'После <b>Have you ever</b> нужна V3: ride → rode → <b>ridden</b>.'},
+  {type:'type', s:'My parents ___ a new car. It\'s in the garage now. (buy)',
+   hint:'Результат сейчас (машина в гараже). Впиши <b>have/has + V3</b>.',
+   a:['have bought','\'ve bought'],
+   ex:'Результат виден сейчас → Present Perfect. <b>My parents</b> = they → <b>have</b>. buy → bought → <b>bought</b>. Ответ: <b>have bought</b>.'},
+  {type:'choice', s:'Найди правильный вариант: «I have met him last summer.»',
+   hint:'Посмотри на маркер времени в конце предложения.',
+   opts:['I met him last summer.','I have meet him last summer.','I has met him last summer.','I meeted him last summer.'], a:'I met him last summer.',
+   ex:'<b>last summer</b> — точное время в прошлом, поэтому Present Perfect здесь невозможен → Past Simple: <b>I met him last summer</b>. meet → <b>met</b> → met.'}
+];
+
+/* ================= DATA: PART 2 ================= */
+const ART = ['a','an','the','—'];
+const P2 = [
+  {title:'Story 1. In the park',
+   parts:['Yesterday I saw ',{a:'a',ex:'Собаку упоминаем <b>впервые</b>, это «какая-то» собака → <b>a</b>. «dog» начинается с согласного звука.'},
+          ' dog in ',{a:'the',ex:'Это конкретный парк — тот, что <b>около моего дома</b>. Понятно, о каком речь → <b>the</b>.'},
+          ' park near my house. ',{a:'the',ex:'Собаку уже упоминали в предыдущем предложении → <b>The</b> dog.'},
+          ' dog was very friendly. It had ',{a:'an',ex:'Ошейник упоминаем впервые → a/an. «orange» начинается с гласного звука [ɒ] → <b>an</b>.'},
+          ' orange collar.']},
+  {title:'Story 2. My aunt',
+   parts:['My aunt is ',{a:'an',ex:'Профессия → a/an. «engineer» начинается с гласного звука → <b>an</b> engineer.'},
+          ' engineer. She lives in ',{a:'—',ex:'Перед названиями городов артикль <b>не нужен</b>: in London.'},
+          ' London. Every morning she has ',{a:'—',ex:'Приёмы пищи — <b>без артикля</b>: have breakfast, have lunch, have dinner.'},
+          ' breakfast and then goes to work. She works in ',{a:'the',ex:'<b>tallest</b> — превосходная степень, а перед ней всегда <b>the</b>: the tallest, the best, the most interesting.'},
+          ' tallest building in the city.']},
+  {title:'Story 3. Tom and the cat',
+   parts:['Tom loves ',{a:'—',ex:'Животные <b>вообще</b> (множественное число, в общем смысле) → <b>без артикля</b>: Tom loves animals.'},
+          ' animals. Last summer he found ',{a:'a',ex:'Котёнка упоминаем впервые, это «какой-то» котёнок → <b>a</b>. «small» начинается с согласного → a, не an.'},
+          ' small cat in his garden. Now ',{a:'the',ex:'Кота уже упоминали → теперь это конкретный кот → <b>the</b> cat.'},
+          ' cat sleeps on his bed, and every morning ',{a:'the',ex:'Солнце — единственное в мире → всегда <b>the</b> sun.'},
+          ' sun wakes them up.']}
+];
+
+/* ================= DATA: PART 3 ================= */
+const V = [
+  {w:'believe',d:'to feel sure that something is true',e:'I believe you.',ru:'верить, считать'},
+  {w:'concentrate',d:'to give all your attention to one thing',e:'I can\'t concentrate on my homework.',ru:'сосредоточиться'},
+  {w:'guess',d:'to give an answer when you are not sure it is right',e:'Guess how old she is!',ru:'угадать, предположить'},
+  {w:'imagine',d:'to make a picture of something in your mind',e:'Imagine a world without cars.',ru:'представлять'},
+  {w:'realise',d:'to suddenly understand or notice something',e:'I realised I was late.',ru:'осознать, понять'},
+  {w:'recognise',d:'to know who someone is because you have seen or heard them before',e:'I didn\'t recognise you with short hair!',ru:'узнать (кого-то / что-то)'},
+  {w:'remember',d:'to keep something in your mind and not forget it',e:'I remember my first teacher.',ru:'помнить, вспомнить'},
+  {w:'suppose',d:'to say something is probably true, but you are not sure',e:'I suppose he\'s at home.',ru:'полагать, предполагать'},
+  {w:'think',d:'to use your mind; to have an opinion about something',e:'What do you think of this film?',ru:'думать'},
+  {w:'wonder',d:'to ask yourself a question because you want to know the answer',e:'I wonder where Tom is.',ru:'интересоваться, задаваться вопросом'}
+];
+const P3 = [
+  {s:'Please be quiet! I can\'t ___ on my homework.',opts:['concentrate','imagine','guess','wonder'],a:'concentrate',
+   ex:'<b>concentrate on</b> — сосредоточиться на чём-то. Запомни предлог: concentrate <b>on</b>.'},
+  {s:'I didn\'t know the answer, so I just ___.',opts:['guessed','believed','recognised','supposed'],a:'guessed',
+   ex:'<b>guess</b> — ответить наугад, когда не знаешь точно.'},
+  {s:'I ___ you! We were in the same class at primary school.',opts:['recognise','realise','remember','imagine'],a:'recognise',
+   ex:'<b>recognise</b> — узнать человека, потому что видел его раньше. Не путай с <b>realise</b> — «осознать».'},
+  {s:'Can you ___ life without mobile phones?',opts:['imagine','believe','concentrate','recognise'],a:'imagine',
+   ex:'<b>imagine</b> — представить себе картинку в голове.'},
+  {s:'Do you ___ in ghosts?',opts:['believe','think','wonder','suppose'],a:'believe',
+   ex:'<b>believe in</b> — верить в существование чего-то: believe <b>in</b> ghosts, believe <b>in</b> magic.'},
+  {s:'I ___ what time it is in Australia now.',opts:['wonder','remember','guess','realise'],a:'wonder',
+   ex:'<b>wonder</b> — задаваться вопросом, «интересно, …». После wonder часто идёт what / where / why / if.'},
+  {s:'Suddenly I ___ that I had left my bag on the bus.',opts:['realised','recognised','imagined','concentrated'],a:'realised',
+   ex:'<b>realise</b> — вдруг понять, осознать. Здесь не recognise: мы не «узнаём» сумку, а понимаем, что её нет.'},
+  {s:'Don\'t forget! ___ to buy some milk on the way home.',opts:['Remember','Recognise','Imagine','Wonder'],a:'Remember',
+   ex:'<b>remember to do</b> — не забыть что-то сделать. Remember — противоположность forget.'},
+  {s:'"Is Tom coming to the party?" — "I ___ so, but I\'m not sure."',opts:['suppose','wonder','recognise','concentrate'],a:'suppose',
+   ex:'<b>I suppose so</b> — «наверное, да», когда не уверен. Так же можно сказать I think so.'},
+  {s:'What do you ___ of my new haircut?',opts:['think','believe','guess','realise'],a:'think',
+   ex:'<b>What do you think of…?</b> — «Что ты думаешь о…? Как тебе…?» Спрашиваем мнение.'}
+];
+
+/* ================= ENGINE ================= */
+const score = {p1:{ok:0,done:0,total:P1.length}, p2:{ok:0,done:0,total:0}, p3:{ok:0,done:0,total:V.length+P3.length}};
+P2.forEach(st=>st.parts.forEach(p=>{if(typeof p==='object')score.p2.total++;}));
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function norm(s){return s.toLowerCase().replace(/[’`]/g,"'").replace(/\s+/g,' ').trim();}
+
+function updateScore(part){
+  const n=part.slice(1);
+  document.getElementById('s'+n).textContent=score[part].ok;
+  document.getElementById('t'+n).textContent=score[part].total;
+  const f=document.getElementById('f'+n);
+  if(score[part].done===score[part].total){
+    const r=score[part].ok/score[part].total;
+    f.innerHTML=`Результат: ${score[part].ok} из ${score[part].total}. `+
+      (r===1?'Отлично, ты готов к тесту! 🎉':r>=0.75?'Хорошо! Перечитай объяснения к ошибкам. 👍':(part==='p3'?'Повтори карточки и нажми «Начать заново». 💪':'Открой шпаргалку ещё раз и нажми «Начать заново». 💪'));
+    f.classList.add('show');
+  } else f.classList.remove('show');
+}
+
+function mark(part,ok){score[part].done++; if(ok)score[part].ok++; updateScore(part);}
+
+function renderP1(){
+  const box=document.getElementById('q1'); box.innerHTML='';
+  P1.forEach((q,i)=>{
+    const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`<div class="qnum">Задание ${i+1}</div>
+      <div class="sentence">${q.s.replace('___','<b>___</b>').replace('___','<b>___</b>')}</div>
+      <div class="hint">💡 ${q.hint}</div>`;
+    const fb=document.createElement('div'); fb.className='fb';
+    if(q.type==='choice'){
+      const o=document.createElement('div'); o.className='opts';
+      shuffle(q.opts).forEach(t=>{
+        const b=document.createElement('button'); b.className='opt'; b.textContent=t;
+        b.onclick=()=>{
+          const ok=t===q.a;
+          o.querySelectorAll('button').forEach(x=>{x.disabled=true; if(x.textContent===q.a)x.classList.add('ok');});
+          if(!ok)b.classList.add('bad');
+          fb.className='fb show '+(ok?'ok':'bad');
+          fb.innerHTML=(ok?'✅ Верно! ':'❌ Не совсем. Правильно: <b>'+q.a+'</b>. ')+q.ex;
+          mark('p1',ok);
+        };
+        o.appendChild(b);
+      });
+      c.appendChild(o);
+    } else {
+      const t=document.createElement('div'); t.className='typing';
+      t.innerHTML='<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Впиши ответ"><button>Проверить</button>';
+      const inp=t.querySelector('input'), btn=t.querySelector('button');
+      const check=()=>{
+        if(!inp.value.trim())return;
+        const ok=q.a.map(norm).includes(norm(inp.value));
+        inp.disabled=true; btn.disabled=true; inp.classList.add(ok?'ok':'bad');
+        fb.className='fb show '+(ok?'ok':'bad');
+        fb.innerHTML=(ok?'✅ Верно! ':'❌ Не совсем. Правильно: <b>'+q.a[0]+'</b>. ')+q.ex;
+        mark('p1',ok);
+      };
+      btn.onclick=check; inp.onkeydown=e=>{if(e.key==='Enter')check();};
+      c.appendChild(t);
+    }
+    c.appendChild(fb); box.appendChild(c);
+  });
+}
+
+function renderP2(){
+  const box=document.getElementById('q2'); box.innerHTML='';
+  let n=0;
+  P2.forEach(st=>{
+    const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`<div class="qnum">${st.title}</div>
+      <div class="hint">💡 Выбери a, an, the или — (без артикля) для каждого пропуска. Подсказка — в шпаргалке.</div>`;
+    const story=document.createElement('div'); story.className='story';
+    const fbs=document.createElement('div'); fbs.className='storyfb';
+    st.parts.forEach(p=>{
+      if(typeof p==='string'){story.appendChild(document.createTextNode(p));return;}
+      n++; const num=n;
+      const g=document.createElement('span'); g.className='gap';
+      g.innerHTML=`<span class="num">${num}</span>`;
+      const fb=document.createElement('div'); fb.className='fb';
+      ART.forEach(a=>{
+        const b=document.createElement('button'); b.textContent=a;
+        b.onclick=()=>{
+          const ok=a===p.a;
+          g.querySelectorAll('button').forEach(x=>{x.disabled=true; if(x.textContent===p.a)x.classList.add('ok');});
+          if(!ok)b.classList.add('bad');
+          fb.className='fb show '+(ok?'ok':'bad');
+          fb.innerHTML=`<b>${num}.</b> `+(ok?'✅ Верно! ':'❌ Правильно: <b>'+p.a+'</b>. ')+p.ex;
+          mark('p2',ok);
+        };
+        g.appendChild(b);
+      });
+      story.appendChild(g); fbs.appendChild(fb);
+    });
+    c.appendChild(story); c.appendChild(fbs); box.appendChild(c);
+  });
+}
+
+function speak(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=0.9;
+  const v=speechSynthesis.getVoices().find(v=>v.lang==='en-GB')||speechSynthesis.getVoices().find(v=>v.lang.startsWith('en'));if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}}
+
+function renderCards(){
+  const box=document.getElementById('cards'); box.innerHTML='';
+  V.forEach(v=>{
+    const c=document.createElement('div'); c.className='fc';
+    c.innerHTML=`<div class="in"><div class="side front"><div class="word">${v.w}</div><button class="say" title="Послушать">🔊</button><div class="tap">нажми, чтобы перевернуть</div></div>
+      <div class="side back"><div>${v.d}</div><div class="exm">${v.e}</div><button class="say" title="Послушать">🔊</button><span class="rutext">${v.ru}</span><button class="ru">RU</button></div></div>`;
+    c.onclick=()=>c.classList.toggle('flip');
+    c.querySelectorAll('.say').forEach((b,i)=>b.onclick=e=>{e.stopPropagation();speak(i===0?v.w:v.w+'. '+v.e);});
+    c.querySelector('.ru').onclick=e=>{e.stopPropagation();c.querySelector('.rutext').classList.toggle('show');};
+    box.appendChild(c);
+  });
+}
+
+function renderMatch(){
+  const mw=document.getElementById('mw'), md=document.getElementById('md'), fb=document.getElementById('mfb');
+  mw.innerHTML=''; md.innerHTML=''; fb.className='fb';
+  let sel=null; const missed=new Set();
+  shuffle(V).forEach(v=>{
+    const b=document.createElement('button'); b.className='mi'; b.textContent=v.w; b.dataset.w=v.w;
+    b.onclick=()=>{ if(b.classList.contains('done'))return; mw.querySelectorAll('.mi').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); sel=v; speak(v.w); };
+    mw.appendChild(b);
+  });
+  shuffle(V).forEach(v=>{
+    const b=document.createElement('button'); b.className='mi'; b.textContent=v.d;
+    b.onclick=()=>{
+      if(!sel||b.classList.contains('done'))return;
+      const wb=mw.querySelector(`[data-w="${sel.w}"]`);
+      if(sel.w===v.w){
+        b.classList.add('done'); wb.classList.remove('sel'); wb.classList.add('done'); b.disabled=wb.disabled=true;
+        fb.className='fb show ok'; fb.innerHTML=`✅ Верно! <b>${v.w}</b> — ${v.ru}.`;
+        mark('p3',!missed.has(v.w));
+      } else {
+        b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),600);
+        fb.className='fb show bad'; fb.innerHTML=`❌ Нет. <b>${sel.w}</b> — это «${sel.ru}», а здесь объяснение другого слова. Попробуй ещё раз.`;
+        missed.add(sel.w);
+      }
+      sel=null;
+    };
+    md.appendChild(b);
+  });
+}
+
+function renderP3(){
+  const box=document.getElementById('q3'); box.innerHTML='';
+  P3.forEach((q,i)=>{
+    const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`<div class="qnum">Задание ${i+1}</div><div class="sentence">${q.s.replace('___','<b>___</b>')}</div>`;
+    const fb=document.createElement('div'); fb.className='fb';
+    const o=document.createElement('div'); o.className='opts';
+    shuffle(q.opts).forEach(t=>{
+      const b=document.createElement('button'); b.className='opt'; b.textContent=t;
+      b.onclick=()=>{
+        const ok=t===q.a;
+        o.querySelectorAll('button').forEach(x=>{x.disabled=true; if(x.textContent===q.a)x.classList.add('ok');});
+        if(!ok)b.classList.add('bad');
+        fb.className='fb show '+(ok?'ok':'bad');
+        fb.innerHTML=(ok?'✅ Верно! ':'❌ Не совсем. Правильно: <b>'+q.a+'</b>. ')+q.ex;
+        mark('p3',ok);
+      };
+      o.appendChild(b);
+    });
+    c.appendChild(o); c.appendChild(fb); box.appendChild(c);
+  });
+}
+
+function resetPart(part){
+  score[part].ok=0; score[part].done=0;
+  if(part==='p1')renderP1(); else if(part==='p2')renderP2(); else {renderMatch();renderP3();}
+  updateScore(part);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+  document.querySelectorAll('.part').forEach(p=>p.classList.toggle('active',p.id===t.dataset.part));
+  window.scrollTo({top:0});
+});
+
+renderP1(); renderP2(); renderCards(); renderMatch(); renderP3(); updateScore('p1'); updateScore('p2'); updateScore('p3');
+</script>
+</body>
+</html>
